@@ -3,6 +3,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// DB Connection
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -16,10 +17,12 @@ if ($conn->connect_error) {
 $errorMsg = "";
 $successMsg = "";
 
+// Check if redirected from registration
 if (isset($_GET['registered']) && $_GET['registered'] === 'success') {
     $successMsg = "Registration successful! Please login below.";
 }
 
+// Handle login
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $inputPassword = $_POST['password'];
@@ -34,14 +37,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->fetch();
 
         if (password_verify($inputPassword, $hashedPassword)) {
+            // Store common session data
             $_SESSION['user_id'] = $id;
             $_SESSION['fullName'] = $fullName;
             $_SESSION['profilePhoto'] = $profilePhoto;
             $_SESSION['userRole'] = $userRole;
 
+            // Store role-specific ID
             if ($userRole === "landlord") {
+                $_SESSION['landlord_id'] = $id;
                 header("Location: landlord_dashboard.php");
             } elseif ($userRole === "tenant") {
+                $_SESSION['tenant_id'] = $id;
                 header("Location: tenant_dashboard.php");
             } else {
                 $errorMsg = "Invalid user role.";
