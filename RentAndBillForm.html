@@ -1,0 +1,77 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent Form</title>
+
+
+<style>
+   
+
+    .parent{
+        border:2px solid black;
+        border-radius: 5%;
+        box-shadow: 5px 4px 2px rgb(118, 59, 17);
+        height: 450px;
+        width: 380px;
+        padding: 10%;
+        background-color: rgb(242, 206, 134);
+      
+
+    }
+
+    .child{
+    padding: 8px;
+    }
+
+    .button{
+        background-color: rgb(46, 85, 224); 
+        border: 1px solid blue; 
+        border-radius:10%;
+
+    }
+
+    .button :hover{
+        background-color: rgb(107, 138, 210);
+    }
+</style>
+</head>
+
+
+<body>
+ 
+
+     <form class="Rentform">
+     
+        <div class="parent">
+          <h2>Rent Receipt Form</h2>  
+        <div class="child">
+          <label for="nam">Enter Tenant Name:</label>
+          <input type="text" name="nam">
+        </div>
+        <div class="child">
+        <label for="aptNo">Enter Apartment No:</label>
+        <input type="text" name="aptNo">
+        </div>
+        <div class="child">
+          <label for="rent">Enter Rent Amount:</label>
+        <input type="number" name="rent">
+        </div>
+
+        <div class="child">
+          <label for="date">Enter Date:</label>
+        <input type="datetime-local" name="date">
+        </div>
+
+        <div class="child">
+          <label for="rent">Enter Due Amount</label>
+        <input type="text" name="rent">
+        </div>
+         
+        <button  class="button child">Submit</button>
+
+        </div>
+          
+    </form>
+</body>
+</html>
