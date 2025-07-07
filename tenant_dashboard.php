@@ -91,6 +91,20 @@ $conn->close();
       background-color: #1c598a;
     }
 
+     .profile-box {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    gap: 10px;
+    padding: 10px;
+  }
+  .profile-box img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
     main {
       max-width: 960px;
       margin: 40px auto;
@@ -163,15 +177,22 @@ $conn->close();
 <body>
 
   <nav class="navbar">
-    <div class="brand">
-      <img src="<?php echo !empty($profilePhoto) ? htmlspecialchars($profilePhoto) : 'image/logo.png'; ?>" alt="Profile">
-    </div>
+    <div class="brand" tabindex="0">
+    <img src="image/logo.png" alt="PropertyPilot Logo" width="30" height="30" />
+  
+   </div>
     <h1>PropertyPilot</h1>
     <a href="profile.html" class="active">Profile</a>
     <a href="rent-bills.html">Rent & Bills</a>
     <a href="notifications.html">Notifications</a>
     <a href="maintenance.html">Maintenance</a>
     <a href="logout.php">LogOut</a>
+
+     <!-- User Profile Info -->
+  <div class="profile-box">
+    <img src="<?php echo htmlspecialchars($profilePhoto); ?>" alt="Profile Photo">
+    <span><?php echo htmlspecialchars($fullName); ?></span>
+  </div>
   </nav>
 
   <main>

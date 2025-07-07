@@ -62,7 +62,7 @@ $profilePhoto = $_SESSION['profilePhoto'] ?: "default-avatar.png"; // Fallback i
     PropertyPilot
   </div>
   <a href="profile.html" class="active">Profile</a>
-  <a href="propertyInfo.php">Property Info</a>
+  <a href="propertyInfo.php">Add Property Info</a>
   <a href="notifications.html">Notifications &amp; Reminders</a>
   <a href="logout.php" class="actionlink linkLogOut">Logout</a>
 
@@ -77,7 +77,7 @@ $profilePhoto = $_SESSION['profilePhoto'] ?: "default-avatar.png"; // Fallback i
 <section class="action-buttons" aria-label="Body Navigation Links">
   <a href="tenant-management.html" class="action-link link-tenant">+ Add Tenant </a>
   <a href="billing.html" class="action-link link-billing">Rent and Bills</a> 
-  <a href="documents.html" class="action-link link-docs">Documents</a>
+  <a href="apartmentList.php" class="action-link link-docs">Apartment List</a>
   <a href="maintenance.html" class="action-link link-maintenance">Maintenance Requests</a>
 </section>
 
