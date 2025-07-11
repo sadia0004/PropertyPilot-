@@ -102,7 +102,7 @@ if ($checkStmt) {
 $conn->close();
 ?>
 
-<!-- ✅ HTML Registration Form (no changes required unless needed) -->
+<!--Registration Form -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
