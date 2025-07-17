@@ -18,6 +18,7 @@ $profilePhoto = $_SESSION['profilePhoto'] ?: "default-avatar.png"; // Fallback i
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>PropertyPilot Dashboard</title>
 <link rel="stylesheet" href="landlordDashboard.css">
+
 <style>
   .profile-box {
     display: flex;

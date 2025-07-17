@@ -127,17 +127,17 @@
   .linkLogOut:hover { background-color: #bf3b30; }
 
   /* Colors for each link */
-  .link-tenant { background-color: #27ae60; }
-  .link-tenant:hover { background-color: #1e874b; }
+  .link-tenant { background-color: #3b27ae; }
+  .link-tenant:hover { background-color: #11a2db; }
 
-  .link-billing { background-color: #e67e22; }
-  .link-billing:hover { background-color: #c6681a; }
+  .link-billing { background-color: #3b27ae; }
+  .link-billing:hover { background-color:#11a2db; }
 
-  .link-docs { background-color: #9b59b6; }
-  .link-docs:hover { background-color: #7e3ea6; }
+  .link-docs { background-color: #3b27ae;}
+  .link-docs:hover { background-color:#11a2db; }
 
-  .link-maintenance { background-color: #e74c3c; }
-  .link-maintenance:hover { background-color: #bf3b30; }
+  .link-maintenance { background-color:#3b27ae; }
+  .link-maintenance:hover { background-color: #11a2db; }
 
   /* Cards container */
   .cards-container {
