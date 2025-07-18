@@ -85,24 +85,7 @@
   }
 
   /* Styled links as buttons */
-  .action-link {
-    flex: 1 1 220px;
-    max-width: 220px;
-    padding: 14px 22px;
-    border-radius: 10px;
-    color: white;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-    user-select: none;
-    white-space: nowrap;
-  }
+ 
    
   .actionlink {
   flex: 1 1 220px;
