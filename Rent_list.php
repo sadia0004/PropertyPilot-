@@ -3,15 +3,38 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Check if landlord is logged in
-if (!isset($_SESSION['landlord_id'])) {
-    die("Unauthorized access. Please log in as a landlord.");
+// ✅ Standardized session check
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
 }
-$landlord_id = $_SESSION['landlord_id'];
 
-// Retrieve user data from session for the navbars
+// Check the role of the user
+$userRole = $_SESSION['userRole'] ?? 'tenant';
+if ($userRole !== 'landlord') {
+    die("Access Denied: This page is for landlords only.");
+}
+$landlord_id = $_SESSION['user_id'];
+
+// Retrieve user data from session
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
+
+// Define the consistent brand color palette
+$primaryDark = '#021934';
+$primaryAccent = '#2c5dbd';
+$textColor = '#f0f4ff';
+$secondaryBackground = '#f0f4ff';
+$cardBackground = '#ffffff';
+
+// Action button colors
+$actionAdd = '#28a745';
+$actionBilling = '#ffc107';
+$actionViewRentList = '#17a2b8';
+$actionViewTenantList = '#6f42c1';
+$actionApartmentList = '#6c757d';
+$actionScheduleCreate = '#e83e8c';
+$actionScheduleDetails = '#fd7e14';
 
 // ✅ DB connection
 $host = "localhost";
@@ -54,8 +77,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rent and Bill List</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
             --primary-color: #006A4E; 
@@ -73,7 +95,7 @@ $conn->close();
         .main-top-navbar {
           background-color: #021934; color: #f0f4ff; padding: 15px 30px; display: flex;
           justify-content: space-between; align-items: center; box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-          z-index: 1001; flex-shrink: 0; height: 80px; width: 100%; 
+          z-index: 1001; flex-shrink: 0; position: fixed; top: 0; left: 0; width: 100%; height: 80px;
         }
         .main-top-navbar .brand { display: flex; align-items: center; font-weight: 700; font-size: 22px; }
         .main-top-navbar .brand img { height: 50px; width: 50px; margin-right: 10px; border-radius: 50%; }
@@ -84,12 +106,11 @@ $conn->close();
           background-color: #dc3545; color: #f0f4ff; padding: 8px 15px; border-radius: 5px;
           text-decoration: none; font-weight: 600; transition: background-color 0.3s ease;
         }
-        .top-right-user-info .logout-btn:hover { background-color: #c0392b; }
-        .dashboard-content-wrapper { display: flex; flex-grow: 1; height: calc(100vh - 80px); overflow: hidden; }
+        .dashboard-content-wrapper { display: flex; flex-grow: 1; margin-top: 80px; height: calc(100vh - 80px); overflow: hidden; }
         .vertical-sidebar {
           display: flex; flex-direction: column; align-items: flex-start; background-color: #021934;
           padding: 20px 15px; color: #f0f4ff; box-shadow: 2px 0 8px rgba(0,0,0,0.2);
-          z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: auto;
+          z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: hidden;
         }
         .vertical-sidebar .nav-links a {
           color: #f0f4ff; text-decoration: none; width: 100%; text-align: left; padding: 12px 15px;
@@ -97,24 +118,30 @@ $conn->close();
           transition: background-color 0.3s ease; display: flex; align-items: center; gap: 10px;
         }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: #2c5dbd; }
-        .action-buttons { margin-top: 30px; width: 100%; }
-        .action-buttons h3 { color: #f0f4ff; font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
-        .action-link {
-          display: block; width: 100%; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px;
-          color: #f0f4ff; font-weight: 600; text-decoration: none; transition: background-color 0.3s ease;
+        .vertical-sidebar .action-buttons {
+          margin-top: 5px; width: 100%; display: flex; flex-direction: column;
+          gap: 8px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 10px;
         }
-        .link-tenant { background-color: #28a745; }
-        .link-billing { background-color: #ffc107; color: #021934; }
-        .link-docs { background-color: #6c757d; }
-        .link-maintenance { background-color: #dc3545; }
-        .link-schedule { background-color: #17a2b8; }
-        .page-main-content {
-          flex-grow: 1; padding: 30px; display: flex; flex-direction: column;
-          align-items: center; height: 100%; overflow-y: auto;
+        .vertical-sidebar .action-buttons h3 { color: #f0f4ff; font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
+        .vertical-sidebar .action-link {
+          width: calc(100% - 30px); padding: 9px 15px; border-radius: 8px; color: #f0f4ff;
+          font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center;
+          justify-content: flex-start; gap: 10px; text-decoration: none; transition: all 0.2s ease;
         }
+        .vertical-sidebar .action-link:hover { transform: translateX(5px); background-color: rgba(255, 255, 255, 0.1); }
+        .vertical-sidebar .link-tenant { background-color: <?php echo $actionAdd; ?>; }
+        .vertical-sidebar .link-billing { background-color: <?php echo $actionBilling; ?>; color: #021934; }
+        .vertical-sidebar .link-rent { background-color: <?php echo $actionViewRentList; ?>; }
+        .vertical-sidebar .link-tenant-list { background-color: <?php echo $actionViewTenantList; ?>; }
+        .vertical-sidebar .link-docs { background-color: <?php echo $actionApartmentList; ?>; }
+        .vertical-sidebar .link-schedule-create { background-color: <?php echo $actionScheduleCreate; ?>; }
+        .vertical-sidebar .link-schedule-details { background-color: <?php echo $actionScheduleDetails; ?>; }
+        
+        main { flex-grow: 1; padding: 30px; height: 100%; overflow-y: auto; }
         .list-container {
             width: 100%;
             max-width: 1200px;
+            margin: 0 auto;
             background-color: var(--card-background);
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -198,11 +225,13 @@ $conn->close();
             </div>
             <section class="action-buttons">
                 <h3>Quick Actions</h3>
-                <a href="propertyInfo.php" class="action-link link-docs">+ Add Property</a>
                 <a href="add_tenant.php" class="action-link link-tenant">+ Add Tenant</a>
-                <a href="Schedule_create.php" class="action-link link-schedule">🗓️ Schedule Meeting</a>
-                <a href="RentAndBillForm.php" class="action-link link-billing active">Rent and Bills</a>
-               
+                <a href="view_tenants.php" class="action-link link-tenant-list">View Tenant List</a>
+                <a href="apartmentList.php" class="action-link link-docs">Apartment List</a>
+                <a href="RentAndBillForm.php" class="action-link link-billing">Rent and Bills</a>
+                <a href="Rent_list.php" class="action-link link-rent active">View Rent List</a>
+                <a href="Schedule_create.php" class="action-link link-schedule-create">Create Schedule</a>
+                <a href="scheduleInfo.php" class="action-link link-schedule-details">🗓️ Schedule Details</a>
             </section>
         </nav>
 
