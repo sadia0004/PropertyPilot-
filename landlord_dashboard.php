@@ -22,11 +22,14 @@ $textColor = '#f0f4ff'; // Light text color for dark backgrounds
 $secondaryBackground = '#f0f4ff'; // Main body background
 $cardBackground = '#ffffff'; // Card background
 
-// Action button colors - slightly desaturated for professionalism
-$actionAdd = '#28a745'; // Green for 'Add Tenant'
-$actionBilling = '#ffc107'; // Yellow/Orange for 'Rent & Bills' (adjust to make less vibrant)
-$actionList = '#6c757d'; // Grey for 'Apartment List'
-$actionMaintenance = '#dc3545'; // Red for 'Maintenance Requests'
+// Action button colors - Professional and distinct palette
+$actionAdd = '#28a745';      // Green for 'Add Tenant'
+$actionBilling = '#ffc107';   // Yellow for 'Rent & Bills'
+$actionViewRentList = '#17a2b8';  // Teal for 'View Rent List'
+$actionViewTenantList = '#6f42c1'; // Purple for 'View Tenant List'
+$actionApartmentList = '#6c757d';// Grey for 'Apartment List'
+$actionSchedule = '#007bff';   // Blue for 'Meeting Schedule'
+$actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
 
 ?>
 <!DOCTYPE html>
@@ -226,12 +229,12 @@ $actionMaintenance = '#dc3545'; // Red for 'Maintenance Requests'
 
     /* Sidebar Action Buttons (styled as prominent links) */
     .vertical-sidebar .action-buttons {
-      margin-top: 30px; /* Space from navigation links */
+      margin-top: 20px; /* Space from navigation links */
       margin-bottom: 20px;
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 12px; /* Slightly reduced gap between action buttons */
+      gap: 10px; /* Reduced gap between action buttons */
       align-items: center;
       border-top: 1px solid rgba(255, 255, 255, 0.1); /* Separator line */
       padding-top: 20px;
@@ -248,7 +251,7 @@ $actionMaintenance = '#dc3545'; // Red for 'Maintenance Requests'
 
     .vertical-sidebar .action-link {
       width: calc(100% - 30px);
-      padding: 12px 15px; /* Slightly less padding to feel more integrated */
+      padding: 10px 15px; /* Reduced vertical padding */
       border-radius: 8px; /* Consistent rounding with nav links */
       color: <?php echo $textColor; ?>;
       font-weight: 600;
@@ -275,13 +278,19 @@ $actionMaintenance = '#dc3545'; // Red for 'Maintenance Requests'
     .vertical-sidebar .link-billing { background-color: <?php echo $actionBilling; ?>; color: <?php echo $primaryDark; ?>; } /* Dark text for light background */
     .vertical-sidebar .link-billing:hover { background-color: #e0a800; }
 
-    .vertical-sidebar .link-docs { background-color: <?php echo $actionList; ?>; }
+    .vertical-sidebar .link-rent { background-color: <?php echo $actionViewRentList; ?>; }
+    .vertical-sidebar .link-rent:hover { background-color: #138496; }
+    
+    .vertical-sidebar .link-tenant-list { background-color: <?php echo $actionViewTenantList; ?>; }
+    .vertical-sidebar .link-tenant-list:hover { background-color: #5a32a3; }
+
+    .vertical-sidebar .link-docs { background-color: <?php echo $actionApartmentList; ?>; }
     .vertical-sidebar .link-docs:hover { background-color: #5a6268; }
 
-    .vertical-sidebar .link-schedule { background-color: <?php echo $actionMaintenance; ?>; }
-    .vertical-sidebar .link-schedule:hover { background-color: #c82333; }
+    .vertical-sidebar .link-schedule { background-color: <?php echo $actionSchedule; ?>; }
+    .vertical-sidebar .link-schedule:hover { background-color: #0056b3; }
 
-
+ 
     /* Main content area */
     main {
       flex-grow: 1;
@@ -543,9 +552,11 @@ $actionMaintenance = '#dc3545'; // Red for 'Maintenance Requests'
           <section class="action-buttons">
             <h3>Quick Actions</h3>
             <a href="add_tenant.php" class="action-link link-tenant">+ Add Tenant</a>
-            <a href="billing.html" class="action-link link-billing">Rent and Bills</a>
-            <a href="apartmentList.php" class="action-link link-docs ">Apartment List</a>
-            <a href="maintenance.html" class="action-link link-schedule">Meeting Schedule</a>
+            <a href="RentAndBillForm.php" class="action-link link-billing">Rent and Bills</a>
+            <a href="Rent_list.php" class="action-link link-rent">View Rent List</a>
+            <a href="view_tenants.php" class="action-link link-tenant-list">View Tenant List</a>
+            <a href="apartmentList.php" class="action-link link-docs">Apartment List</a>
+            <a href="Schedule_create.php" class="action-link link-schedule">Meeting Schedule</a>
           </section>
         </nav>
 
