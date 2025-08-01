@@ -17,7 +17,7 @@ $userRole = $_SESSION['userRole']; // 'tenant' or 'landlord'
 // Define the consistent brand color palette for a professional look
 $primaryDark = '#021934'; // Main dark blue for navbars
 $primaryAccent = '#2c5dbd'; // Accent blue for active/hover states
-$primaryHighlight = '#4CAF50'; // Green for active line/success (can be adjusted)
+$primaryHighlight = '#4CAF50'; // Green for active line/success
 $textColor = '#f0f4ff'; // Light text color for dark backgrounds
 $secondaryBackground = '#f0f4ff'; // Main body background
 $cardBackground = '#ffffff'; // Card background
@@ -28,7 +28,8 @@ $actionBilling = '#ffc107';   // Yellow for 'Rent & Bills'
 $actionViewRentList = '#17a2b8';  // Teal for 'View Rent List'
 $actionViewTenantList = '#6f42c1'; // Purple for 'View Tenant List'
 $actionApartmentList = '#6c757d';// Grey for 'Apartment List'
-$actionSchedule = '#007bff';   // Blue for 'Meeting Schedule'
+$actionScheduleCreate = '#e83e8c';   // Magenta for 'Create Schedule'
+$actionScheduleDetails = '#fd7e14'; // Orange for 'Schedule Details'
 $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
 
 ?>
@@ -38,6 +39,7 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PropertyPilot Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     /* Global box-sizing for consistent layouts */
@@ -51,41 +53,35 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
       background-color: <?php echo $secondaryBackground; ?>;
       color: #222;
       display: flex;
-      flex-direction: column; /* Stack top navbar and main content wrapper vertically */
-      height: 100vh; /* Crucial: Make body fill viewport height */
-      overflow: hidden; /* Crucial: Prevent body from showing scrollbar; children will manage */
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
     }
 
     /* Main Top Navigation Bar (now truly fixed) */
     .main-top-navbar {
-      background-color: <?php echo $primaryDark; ?>; /* Consistent brand color */
+      background-color: <?php echo $primaryDark; ?>;
       color: <?php echo $textColor; ?>;
       padding: 15px 30px;
       display: flex;
-      justify-content: space-between; /* Space out left and right content */
+      justify-content: space-between;
       align-items: center;
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-      z-index: 1001; /* Ensure it's always on top */
-      flex-shrink: 0; /* Prevents it from shrinking */
-      
-      /* Fixed positioning to ensure it's always visible */
+      z-index: 1001;
+      flex-shrink: 0;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: 80px; /* Explicit height, for calculation below */
-      box-sizing: border-box; /* Include padding in height */
+      height: 80px;
+      box-sizing: border-box;
     }
 
-    /* Top Nav: Left Side (Logo + Name) */
     .main-top-navbar .brand {
       display: flex;
       align-items: center;
       font-weight: 700;
       font-size: 22px;
-      white-space: nowrap;
-      user-select: none;
-      letter-spacing: 0.5px;
     }
 
     .main-top-navbar .brand img {
@@ -96,20 +92,17 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
       object-fit: contain;
       background: <?php echo $cardBackground; ?>;
       padding: 3px;
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
     }
 
-    /* Top Nav: Right Side (Welcome, User Info, Logout) */
     .top-right-user-info {
       display: flex;
       align-items: center;
-      gap: 20px; /* Space between elements */
+      gap: 20px;
     }
 
     .top-right-user-info .welcome-greeting {
       font-size: 1.1em;
       font-weight: 500;
-      white-space: nowrap;
     }
 
     .top-right-user-info .user-photo {
@@ -121,83 +114,53 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
     }
 
     .top-right-user-info .logout-btn {
-      background-color: <?php echo $actionMaintenance; ?>; /* Red for logout */
+      background-color: <?php echo $actionMaintenance; ?>;
       color: <?php echo $textColor; ?>;
       padding: 8px 15px;
       border-radius: 5px;
       text-decoration: none;
       font-weight: 600;
       transition: background-color 0.3s ease;
-      white-space: nowrap;
     }
 
     .top-right-user-info .logout-btn:hover {
       background-color: #c0392b; 
     }
 
-    /* Wrapper for Vertical Sidebar and Main Content */
     .dashboard-content-wrapper {
-      display: flex; /* Arranges sidebar and main content horizontally */
-      flex-grow: 1; /* Makes this div fill remaining vertical space below fixed header */
-      
-      /* Crucial: Position this wrapper right below the fixed header */
-      margin-top: 80px; /* Offset by the height of the main-top-navbar */
-      
-      /* Crucial: Make it fill the exact remaining viewport height */
+      display: flex;
+      flex-grow: 1;
+      margin-top: 80px;
       height: calc(100vh - 80px); 
-      overflow: hidden; /* Crucial: Hide its own scrollbar, children will handle */
+      overflow: hidden;
     }
 
-    /* Vertical Sidebar Styles (now fills remaining height and scrolls internally) */
     .vertical-sidebar {
       display: flex;
-      flex-direction: column; /* Stack items vertically */
-      align-items: flex-start; /* Align items to the left */
-      background-color: <?php echo $primaryDark; ?>; /* Consistent brand color */
+      flex-direction: column;
+      align-items: flex-start;
+      background-color: <?php echo $primaryDark; ?>;
       padding: 20px 15px;
       color: <?php echo $textColor; ?>;
       box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
       z-index: 1000;
-      flex-shrink: 0; /* Prevents it from shrinking */
-      width: 250px; /* Fixed width */
-      
-      /* Fills 100% height of dashboard-content-wrapper */
+      flex-shrink: 0;
+      width: 250px;
       height: 100%; 
-      /* Crucial: Sidebar gets its own scrollbar if its content overflows */
-      overflow-y: auto; 
-      overflow-x: hidden;
-      
-      /* Removed position: sticky and top/min-height */
+      overflow-y: hidden; /* Removed scrollbar */
     }
 
-    .vertical-sidebar::-webkit-scrollbar {
-      width: 8px; /* Width of the scrollbar */
-    }
-
-    .vertical-sidebar::-webkit-scrollbar-track {
-      background: <?php echo $primaryDark; ?>; /* Track color */
-    }
-
-    .vertical-sidebar::-webkit-scrollbar-thumb {
-      background-color: <?php echo $primaryAccent; ?>; /* Scrollbar color */
-      border-radius: 10px; /* Rounded scrollbar */
-      border: 2px solid <?php echo $primaryDark; ?>; /* Padding around thumb */
-    }
-
-    /* Sidebar Navigation Links */
     .vertical-sidebar .nav-links a {
       color: <?php echo $textColor; ?>;
       text-decoration: none;
-      width:100% ; /* Full width minus padding */
-      text-align: left; /* Align text to the left */
-      padding: 12px 15px; /* Adjust padding for vertical links */
-      margin: 8px 0; /* Vertical margin between links */
+      width:100% ;
+      text-align: left;
+      padding: 12px 15px;
+      margin: 8px 0;
       font-weight: 600;
       font-size: 16px;
       border-radius: 8px;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      position: relative;
-      overflow: hidden;
+      transition: background-color 0.3s ease;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -206,38 +169,17 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
     .vertical-sidebar .nav-links a:hover,
     .vertical-sidebar .nav-links a.active {
       background-color: <?php echo $primaryAccent; ?>;
-      transform: none;
     }
 
-    /* Vertical underline effect on hover/active for nav links */
-    .vertical-sidebar .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 4px; /* Thickness of the vertical line */
-      height: 100%; /* Line spans full height of link */
-      background-color: <?php echo $primaryHighlight; ?>; /* Accent color */
-      transform: translateX(-100%);
-      transition: transform 0.3s ease-out;
-    }
-
-    .vertical-sidebar .nav-links a:hover::after,
-    .vertical-sidebar .nav-links a.active::after {
-      transform: translateX(0);
-    }
-
-    /* Sidebar Action Buttons (styled as prominent links) */
     .vertical-sidebar .action-buttons {
-      margin-top: 20px; /* Space from navigation links */
-      margin-bottom: 20px;
+  
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 10px; /* Reduced gap between action buttons */
+      gap: 7px; /* Further reduced gap */
       align-items: center;
-      border-top: 1px solid rgba(255, 255, 255, 0.1); /* Separator line */
-      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      
     }
 
     .vertical-sidebar .action-buttons h3 {
@@ -245,240 +187,112 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
         font-size: 1.1em;
         margin-bottom: 10px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        opacity: 0.8;
     }
 
     .vertical-sidebar .action-link {
       width: calc(100% - 30px);
-      padding: 10px 15px; /* Reduced vertical padding */
-      border-radius: 8px; /* Consistent rounding with nav links */
+      padding: 9px 15px; /* Reduced padding */
+      border-radius: 8px;
       color: <?php echo $textColor; ?>;
       font-weight: 600;
-      font-size: 15px; /* Slightly smaller font for secondary importance */
+      font-size: 14px; /* Slightly smaller font */
       cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: flex-start; /* Align text to start for a list-like feel */
+      justify-content: flex-start;
       gap: 10px;
       text-decoration: none;
       transition: background-color 0.3s ease, transform 0.2s ease;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Lighter shadow for these buttons */
     }
 
     .vertical-sidebar .action-link:hover {
-        transform: translateX(5px); /* Slide effect on hover */
-        background-color: rgba(255, 255, 255, 0.1); /* Subtle hover for these */
+        transform: translateX(5px);
+        background-color: rgba(255, 255, 255, 0.1);
     }
-
-    /* Specific action link colors (backgrounds) */
-    .vertical-sidebar .link-tenant { background-color: <?php echo $actionAdd; ?>; }
-    .vertical-sidebar .link-tenant:hover { background-color: #218838; }
-
-    .vertical-sidebar .link-billing { background-color: <?php echo $actionBilling; ?>; color: <?php echo $primaryDark; ?>; } /* Dark text for light background */
-    .vertical-sidebar .link-billing:hover { background-color: #e0a800; }
-
-    .vertical-sidebar .link-rent { background-color: <?php echo $actionViewRentList; ?>; }
-    .vertical-sidebar .link-rent:hover { background-color: #138496; }
     
+    /* Corrected and distinct action link colors */
+    .vertical-sidebar .link-tenant { background-color: <?php echo $actionAdd; ?>; }
+    .vertical-sidebar .link-billing { background-color: <?php echo $actionBilling; ?>;  }
+    .vertical-sidebar .link-rent { background-color: <?php echo $actionViewRentList; ?>; }
     .vertical-sidebar .link-tenant-list { background-color: <?php echo $actionViewTenantList; ?>; }
-    .vertical-sidebar .link-tenant-list:hover { background-color: #5a32a3; }
-
     .vertical-sidebar .link-docs { background-color: <?php echo $actionApartmentList; ?>; }
-    .vertical-sidebar .link-docs:hover { background-color: #5a6268; }
+    .vertical-sidebar .link-schedule-create { background-color: <?php echo $actionScheduleCreate; ?>; }
+    .vertical-sidebar .link-schedule-details { background-color: <?php echo $actionScheduleDetails; ?>; }
 
-    .vertical-sidebar .link-schedule { background-color: <?php echo $actionSchedule; ?>; }
-    .vertical-sidebar .link-schedule:hover { background-color: #0056b3; }
 
- 
-    /* Main content area */
     main {
       flex-grow: 1;
-      padding: 30px;
-      /* Crucial: Fills 100% height of dashboard-content-wrapper */
+      padding: 40px;
       height: 100%; 
-      /* Crucial: Main content panel gets its own scrollbar */
       overflow-y: auto; 
-      overflow-x: hidden;
     }
 
-    /* Cards container */
+    .welcome-header {
+        margin-bottom: 40px;
+    }
+    .welcome-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 5px 0;
+    }
+    .welcome-header p {
+        font-size: 1.1rem;
+        color: #7f8c8d;
+        margin: 0;
+    }
+
     .cards-container {
-      margin: 50px auto;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 25px;
-      max-width: 960px;
-      padding: 0 20px;
+      gap: 30px;
     }
 
-    /* Individual card styles */
     .card {
       background: <?php echo $cardBackground; ?>;
-      padding: 30px 25px;
+      padding: 25px;
       border-radius: 15px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
       text-align: center;
-      transition: box-shadow 0.3s ease;
+      border-top: 4px solid transparent;
+      transition: all 0.3s ease;
     }
 
     .card:hover {
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
     }
+    
+    .card.flats { border-color: #3498db; }
+    .card.tenants { border-color: #9b59b6; }
+    .card.income { border-color: #2ecc71; }
+    .card.maintenance { border-color: #e74c3c; }
 
     .card .icon {
-      font-size: 42px;
-      color: <?php echo $primaryAccent; ?>;
+      font-size: 2.5rem;
       margin-bottom: 15px;
     }
+    .card.flats .icon { color: #3498db; }
+    .card.tenants .icon { color: #9b59b6; }
+    .card.income .icon { color: #2ecc71; }
+    .card.maintenance .icon { color: #e74c3c; }
+
 
     .card .number {
-      font-size: 38px;
+      font-size: 2.8rem;
       font-weight: 700;
-      color: #34495e;
-      margin-bottom: 10px;
+      color: #2c3e50;
+      margin-bottom: 5px;
     }
 
     .card .label {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 1rem;
+      font-weight: 500;
       color: #7f8c8d;
-      letter-spacing: 0.8px;
       text-transform: uppercase;
-    }
-
-    /* Welcome Container for main content area */
-    .welcome-container {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .welcome-container .welcome-message {
-        font-size: 2.2em;
-        font-weight: 700;
-        color: #34495e;
-        margin-bottom: 15px;
-    }
-
-    .property-name {
-        font-size: 1.1em;
-        color: #555;
-        margin-bottom: 8px;
-    }
-
-    .important-alerts {
-        font-size: 1.2em;
-        font-weight: 600;
-        color: <?php echo $actionMaintenance; ?>; /* Use red for alerts */
-        background-color: #ffe0e0;
-        padding: 10px 20px;
-        border-radius: 8px;
-        display: inline-block;
-        margin-top: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-
-    /* Responsive design for smaller screens */
-    @media (max-width: 768px) {
-      body {
-        overflow-y: auto; /* Re-enable body scroll for mobile */
-      }
-      .main-top-navbar {
-        height: auto; /* Allow height to adjust on mobile */
-        position: relative; /* No fixed position on mobile */
-        padding: 10px 15px;
-        flex-wrap: wrap;
-      }
-      .main-top-navbar .brand {
-        font-size: 18px;
-      }
-      .main-top-navbar .brand img {
-        height: 35px;
-        width: 35px;
-      }
-      .top-right-user-info {
-        width: 100%;
-        justify-content: center;
-        margin-top: 10px;
-        gap: 10px;
-      }
-      .top-right-user-info .welcome-greeting {
-        display: none;
-      }
-      .top-right-user-info .user-photo {
-        width: 30px;
-        height: 30px;
-      }
-      .top-right-user-info .logout-btn {
-        padding: 6px 12px;
-        font-size: 14px;
-      }
-
-      .dashboard-content-wrapper {
-        flex-direction: column; /* Stack sidebar and main content vertically */
-        height: auto; /* Auto height on mobile */
-        overflow: visible; /* Let children expand and body scroll */
-        margin-top: 0; /* Remove margin-top on mobile */
-      }
-
-      .vertical-sidebar {
-        position: relative; /* No fixed/sticky on mobile */
-        top: auto; /* Remove top offset */
-        height: auto; /* Auto height on mobile */
-        width: 100%; /* Take full width */
-        flex-direction: row; /* Layout sidebar items horizontally */
-        justify-content: space-around; /* Distribute items */
-        padding: 10px 0;
-        box-shadow: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        /* Ensure min-height is reset for mobile */
-        min-height: auto;
-        overflow-y: hidden; /* Prevent internal scroll on mobile sidebar */
-      }
-      .vertical-sidebar .nav-links {
-          display: flex; /* Make nav links a flex container for horizontal layout */
-          width: 100%;
-          justify-content: space-around;
-          flex-wrap: wrap;
-      }
-      .vertical-sidebar .nav-links a {
-        padding: 8px 10px;
-        margin: 0 5px;
-        width: auto;
-        font-size: 14px;
-        text-align: center;
-      }
-      .vertical-sidebar .nav-links a::after {
-        width: 100%;
-        height: 3px;
-        transform: translateX(-100%);
-      }
-      .vertical-sidebar .nav-links a:hover::after,
-      .vertical-sidebar .nav-links a.active::after {
-        transform: translateX(0);
-      }
-
-      /* Hide action buttons section on mobile to avoid clutter */
-      .action-buttons {
-        display: none;
-      }
-
-      main {
-        padding: 15px;
-        height: auto; /* Auto height on mobile */
-        overflow-y: visible; /* Let content flow out and body scroll */
-      }
-      .cards-container {
-        grid-template-columns: repeat(1, 1fr);
-        padding: 0 10px;
-      }
+      letter-spacing: 1px;
     }
   </style>
-
 </head>
 
 <body>
@@ -488,7 +302,7 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
       PropertyPilot
     </div>
     <div class="top-right-user-info">
-      <span class="welcome-greeting">👋 Welcome, <?php echo htmlspecialchars($fullName); ?></span>
+      <span class="welcome-greeting"><?php echo htmlspecialchars($fullName); ?></span>
       <img class="user-photo" src="<?php echo htmlspecialchars($profilePhoto); ?>" alt="Profile Photo">
       <a href="logout.php" class="logout-btn">Logout</a>
     </div>
@@ -504,41 +318,8 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
             <a href="maintenance.html">Maintenance</a>
           </div>
         </nav>
-
         <main>
-          <section class="welcome-container">
-            <div class="welcome-message" id="welcomeMessage">Your Dashboard Overview</div>
-            <div class="property-name" id="apartmentInfo">🏠 Apartment: -</div>
-            <div class="property-name" id="professionInfo">🧑‍💼 Profession: -</div>
-            <div class="property-name" id="rentDateInfo">📅 Rent Date: -</div>
-            <div class="important-alerts" id="rentAlert">🔔 Your rent is due in - days</div>
-          </section>
-
-          <section class="cards-container">
-            <div class="card">
-              <div class="icon">💰</div>
-              <div class="number" id="rentDue">৳0</div>
-              <div class="label">Rent Due</div>
-            </div>
-
-            <div class="card">
-              <div class="icon">📄</div>
-              <div class="number" id="pendingBills">0</div>
-              <div class="label">Pending Bills</div>
-            </div>
-
-            <div class="card">
-              <div class="icon">🔔</div>
-              <div class="number" id="unreadNotifications">0</div>
-              <div class="label">Unread Notifications</div>
-            </div>
-
-            <div class="card">
-              <div class="icon">🛠️</div>
-              <div class="number" id="openMaintenance"></div>
-              <div class="label">Open Maintenance</div>
-            </div>
-          </section>
+          <!-- Tenant content here -->
         </main>
 
     <?php elseif ($userRole === 'landlord'): ?>
@@ -552,42 +333,44 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
           <section class="action-buttons">
             <h3>Quick Actions</h3>
             <a href="add_tenant.php" class="action-link link-tenant">+ Add Tenant</a>
-            <a href="RentAndBillForm.php" class="action-link link-billing">Rent and Bills</a>
-            <a href="Rent_list.php" class="action-link link-rent">View Rent List</a>
             <a href="view_tenants.php" class="action-link link-tenant-list">View Tenant List</a>
             <a href="apartmentList.php" class="action-link link-docs">Apartment List</a>
-            <a href="Schedule_create.php" class="action-link link-schedule">Meeting Schedule</a>
+            <a href="RentAndBillForm.php" class="action-link link-billing">Rent and Bills</a>
+            <a href="Rent_list.php" class="action-link link-rent">View Rent List</a>
+            <a href="Schedule_create.php" class="action-link link-schedule-create">Create Schedule</a>
+            <a href="scheduleInfo.php" class="action-link link-schedule-details active">🗓️ Schedule Details</a>
           </section>
         </nav>
 
         <main>
+          <header class="welcome-header">
+              <h1>👋 Welcome back, <?php echo htmlspecialchars(explode(' ', $fullName)[0]); ?>!</h1>
+              <p>Here's a summary of your property portfolio.</p>
+          </header>
           <section class="cards-container">
-            <div class="card">
-              <div class="icon">🏢</div>
+            <div class="card flats">
+              <div class="icon"><i class="fas fa-building"></i></div>
               <div class="number">12</div>
               <div class="label">Total Flats</div>
             </div>
-
-            <div class="card">
-              <div class="icon">👥</div>
+            <div class="card tenants">
+              <div class="icon"><i class="fas fa-users"></i></div>
               <div class="number">38</div>
               <div class="label">Total Tenants</div>
             </div>
-
-            <div class="card">
-              <div class="icon">💵</div>
+            <div class="card income">
+              <div class="icon"><i class="fas fa-dollar-sign"></i></div>
               <div class="number">$45,600</div>
               <div class="label">Monthly Income</div>
             </div>
-
-            <div class="card">
-              <div class="icon">🚧</div>
+            <div class="card maintenance">
+              <div class="icon"><i class="fas fa-tools"></i></div>
               <div class="number">3</div>
               <div class="label">Pending Maintenance</div>
             </div>
           </section>
         </main>
-
     <?php endif; ?>
-  </div> </body>
+  </div> 
+</body>
 </html>

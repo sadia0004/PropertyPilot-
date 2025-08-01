@@ -3,15 +3,38 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Check if landlord is logged in
-if (!isset($_SESSION['landlord_id'])) {
-    die("Unauthorized access. Please log in as a landlord.");
+// ✅ Standardized session check
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
 }
-$landlord_id = $_SESSION['landlord_id'];
 
-// Retrieve user data from session for the navbars
+// Check the role of the user
+$userRole = $_SESSION['userRole'] ?? 'tenant';
+if ($userRole !== 'landlord') {
+    die("Access Denied: This page is for landlords only.");
+}
+$landlord_id = $_SESSION['user_id'];
+
+// Retrieve user data from session
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
+
+// Define the consistent brand color palette
+$primaryDark = '#021934';
+$primaryAccent = '#2c5dbd';
+$textColor = '#f0f4ff';
+$secondaryBackground = '#f0f4ff';
+$cardBackground = '#ffffff';
+
+// Action button colors
+$actionAdd = '#28a745';
+$actionBilling = '#ffc107';
+$actionViewRentList = '#17a2b8';
+$actionViewTenantList = '#6f42c1';
+$actionApartmentList = '#6c757d';
+$actionScheduleCreate = '#e83e8c';
+$actionScheduleDetails = '#fd7e14';
 
 // Initialize messages
 $successMsg = "";
@@ -27,7 +50,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// ✅ Fetch all tenant details for the logged-in landlord to pass to JavaScript
+// ✅ Fetch all tenant details for the logged-in landlord
 $tenantDetails = [];
 $detailsQuery = "SELECT tenant_id, name, apartment_no, monthly_rent FROM addtenants WHERE landlord_id = ?";
 $stmt_details = $conn->prepare($detailsQuery);
@@ -35,14 +58,12 @@ $stmt_details->bind_param("i", $landlord_id);
 $stmt_details->execute();
 $result = $stmt_details->get_result();
 while ($row = $result->fetch_assoc()) {
-    // Use apartment_no as the key for easy lookup in JavaScript
     $tenantDetails[$row['apartment_no']] = $row;
 }
 $stmt_details->close();
 
 // ✅ Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get data from form
     $tenant_id = $_POST['tenant_id'] ?? 0;
     $apartment_no = $_POST['apartment_no'] ?? '';
     $rent_amount = $_POST['rent_amount'] ?? 0;
@@ -52,11 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $utility_bill = $_POST['utility_bill'] ?? 0;
     $guard_bill = $_POST['guard_bill'] ?? 0;
 
-    // ✅ Initial Server-side validation
     if (empty($tenant_id) || empty($apartment_no) || empty($billing_date) || !is_numeric($rent_amount)) {
-        $errorMsg = "❌ Please select an apartment and ensure all required fields are filled correctly.";
+        $errorMsg = "❌ Please select an apartment and fill all required fields.";
     } else {
-        // ✅ NEW VALIDATION: Check if a bill for this tenant and month already exists
         $billing_month = date('m', strtotime($billing_date));
         $billing_year = date('Y', strtotime($billing_date));
 
@@ -66,23 +85,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $checkResult = $checkStmt->get_result();
 
         if ($checkResult->num_rows > 0) {
-            // If a record exists, set an error message
-            $errorMsg = "❌ You have already added the bill for this tenant for the selected month (" . date('F Y', strtotime($billing_date)) . ").";
+            $errorMsg = "❌ Bill for this tenant for " . date('F Y', strtotime($billing_date)) . " already exists.";
         } else {
-            // ✅ Proceed with DB insert if no existing record is found
             $stmt = $conn->prepare("INSERT INTO rentAndBill (landlord_id, tenant_id, apartment_no, rent_amount, previous_due, water_bill, utility_bill, guard_bill, billing_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param(
-                "iisddddds",
-                $landlord_id,
-                $tenant_id,
-                $apartment_no,
-                $rent_amount,
-                $previous_due,
-                $water_bill,
-                $utility_bill,
-                $guard_bill,
-                $billing_date
-            );
+            $stmt->bind_param("iisddddds", $landlord_id, $tenant_id, $apartment_no, $rent_amount, $previous_due, $water_bill, $utility_bill, $guard_bill, $billing_date);
 
             if ($stmt->execute()) {
                 $successMsg = "✅ Rent and bill information saved successfully.";
@@ -107,8 +113,8 @@ $conn->close();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #006A4E; 
-            --secondary-color: #4A90E2; 
+            --primary-color: #006A4E;
+            --secondary-color: #4A90E2;
             --background-color: #f0f4ff;
             --card-background: #ffffff;
             --text-color: #333;
@@ -121,8 +127,8 @@ $conn->close();
         }
         .main-top-navbar {
           background-color: #021934; color: #f0f4ff; padding: 15px 30px; display: flex;
-          justify-content: space-between; align-items: center; box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-          z-index: 1001; flex-shrink: 0; height: 80px; width: 100%; 
+          justify-content: space-between; align-items: center; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+          z-index: 1001; flex-shrink: 0; position: fixed; top: 0; left: 0; width: 100%; height: 80px;
         }
         .main-top-navbar .brand { display: flex; align-items: center; font-weight: 700; font-size: 22px; }
         .main-top-navbar .brand img { height: 50px; width: 50px; margin-right: 10px; border-radius: 50%; }
@@ -133,12 +139,11 @@ $conn->close();
           background-color: #dc3545; color: #f0f4ff; padding: 8px 15px; border-radius: 5px;
           text-decoration: none; font-weight: 600; transition: background-color 0.3s ease;
         }
-        .top-right-user-info .logout-btn:hover { background-color: #c0392b; }
-        .dashboard-content-wrapper { display: flex; flex-grow: 1; height: calc(100vh - 80px); overflow: hidden; }
+        .dashboard-content-wrapper { display: flex; flex-grow: 1; margin-top: 80px; height: calc(100vh - 80px); overflow: hidden; }
         .vertical-sidebar {
           display: flex; flex-direction: column; align-items: flex-start; background-color: #021934;
-          padding: 20px 15px; color: #f0f4ff; box-shadow: 2px 0 8px rgba(0,0,0,0.2);
-          z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: auto;
+          padding: 20px 15px; color: #f0f4ff; box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+          z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: hidden;
         }
         .vertical-sidebar .nav-links a {
           color: #f0f4ff; text-decoration: none; width: 100%; text-align: left; padding: 12px 15px;
@@ -146,129 +151,94 @@ $conn->close();
           transition: background-color 0.3s ease; display: flex; align-items: center; gap: 10px;
         }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: #2c5dbd; }
-        .action-buttons { margin-top: 30px; width: 100%; }
-        .action-buttons h3 { color: #f0f4ff; font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
-        .action-link {
-          display: block; width: 100%; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px;
-          color: #f0f4ff; font-weight: 600; text-decoration: none; transition: background-color 0.3s ease;
-        }
-        .link-tenant { background-color: #28a745; }
-        .link-billing { background-color: #ffc107; color: #021934; }
-        .link-docs { background-color: #6c757d; }
-        .link-maintenance { background-color: #dc3545; }
-        .link-schedule { background-color: #17a2b8; }
-        .page-main-content {
-          flex-grow: 1; padding: 30px; display: flex; justify-content: center;
-          align-items: flex-start; height: 100%; overflow-y: auto;
-        }
-        .form-wrapper {
+        .vertical-sidebar .action-buttons {
           width: 100%;
-          max-width: 900px;
-          background-color: var(--card-background);
-          border-radius: 20px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          gap: 6px; /* Reduced gap between buttons */
+          align-items: center;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          
+        }
+        .vertical-sidebar .action-buttons h3 {
+          color: #f0f4ff;
+          font-size: 1.1em;
+          margin-bottom: 8px; /* Reduced margin */
+          text-transform: uppercase;
+        }
+        .vertical-sidebar .action-link {
+          width: calc(100% - 30px);
+          padding: 8px 15px; /* Reduced vertical padding */
+          border-radius: 8px;
+          color: #f0f4ff;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          gap: 10px;
+          text-decoration: none;
+          transition: all 0.2s ease;
+        }
+        .vertical-sidebar .action-link:hover { transform: translateX(5px); background-color: rgba(255, 255, 255, 0.1); }
+        .vertical-sidebar .link-tenant { background-color: <?php echo $actionAdd; ?>; }
+        .vertical-sidebar .link-billing { background-color: <?php echo $actionBilling; ?>; color: <?php echo $primaryDark; ?>; }
+        .vertical-sidebar .link-rent { background-color: <?php echo $actionViewRentList; ?>; }
+        .vertical-sidebar .link-tenant-list { background-color: <?php echo $actionViewTenantList; ?>; }
+        .vertical-sidebar .link-docs { background-color: <?php echo $actionApartmentList; ?>; }
+        .vertical-sidebar .link-schedule-create { background-color: <?php echo $actionScheduleCreate; ?>; }
+        .vertical-sidebar .link-schedule-details { background-color: <?php echo $actionScheduleDetails; ?>; }
+        
+        main { flex-grow: 1; padding: 30px; height: 100%; overflow-y: auto; }
+        .form-wrapper {
+          width: 100%; max-width: 900px; background-color: var(--card-background);
+          border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); overflow: hidden; margin: 0 auto;
         }
         .form-header {
-          background-color: var(--primary-color);
-          color: white;
-          padding: 20px 30px;
-          text-align: center;
+          background-color: var(--primary-color); color: white; padding: 20px 30px; text-align: center;
         }
         .form-header h1 { margin: 0; font-size: 1.8rem; font-weight: 600; }
         .form-grid {
-            padding: 30px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px 40px;
+            padding: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 25px 40px;
         }
         .form-section-title {
-            grid-column: 1 / -1;
-            margin: 0 0 10px 0;
-            color: var(--primary-color);
-            font-size: 1.4rem;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
+            grid-column: 1 / -1; margin: 0 0 10px 0; color: var(--primary-color);
+            font-size: 1.4rem; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;
         }
         .input-wrapper { position: relative; }
         .input-field {
-            padding: 12px 15px 12px 40px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            width: 100%;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            padding: 12px 15px 12px 40px; border-radius: 8px; border: 1px solid var(--border-color);
+            width: 100%; font-family: 'Poppins', sans-serif;
         }
         .input-field[readonly] { background-color: #e9ecef; cursor: not-allowed; }
-        .input-wrapper i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
-        }
+        .input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
         .action-container {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-top: 10px;
+            grid-column: 1 / -1; display: flex; justify-content: center;
+            gap: 20px; flex-wrap: wrap; margin-top: 10px;
         }
         .action-button {
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 15px 30px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: white; border: none; border-radius: 8px; padding: 15px 30px;
+            font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 10px; text-decoration: none;
         }
         .save-button {
             background: linear-gradient(45deg, var(--primary-color), #008a63);
             box-shadow: 0 4px 15px rgba(0, 106, 78, 0.4);
         }
-        .save-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 106, 78, 0.5);
-        }
-        .total-section {
-            grid-column: 1 / -1;
-            margin-top: 10px;
-            padding: 25px;
-            background-color: #f8f9fa;
-            border-radius: 15px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }
-        .total-section h2 {
-            border: none;
-            padding: 0;
-            margin-bottom: 10px;
-            color: #555;
-            font-size: 1.2rem;
-        }
-        #total-amount {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
+        .save-button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 106, 78, 0.5); }
         .message, .error {
-          grid-column: 1 / -1;
-          margin-bottom: 0; padding: 12px; border-radius: 5px;
+          grid-column: 1 / -1; margin-bottom: 0; padding: 12px; border-radius: 5px;
           font-weight: 500; text-align: center;
         }
         .message { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     </style>
 </head>
+
 <body>
     <header class="main-top-navbar">
-        <div class="brand"><img src="image/logo.png" alt="Logo"/>PropertyPilot</div>
+        <div class="brand"><img src="image/logo.png" alt="Logo" />PropertyPilot</div>
         <div class="top-right-user-info">
             <span class="welcome-greeting">👋 Welcome, <?php echo htmlspecialchars($fullName); ?></span>
             <img class="user-photo" src="<?php echo htmlspecialchars($profilePhoto); ?>" alt="Profile">
@@ -285,11 +255,13 @@ $conn->close();
             </div>
             <section class="action-buttons">
                 <h3>Quick Actions</h3>
-                <a href="Rent_list.php" class="action-link link-billing active">View Rent List</a>
-                <a href="propertyInfo.php" class="action-link link-docs">+ Add Property</a>
                 <a href="add_tenant.php" class="action-link link-tenant">+ Add Tenant</a>
-                <a href="Schedule_create.php" class="action-link link-schedule">🗓️ Schedule Meeting</a>
-              
+                <a href="view_tenants.php" class="action-link link-tenant-list">View Tenant List</a>
+                <a href="apartmentList.php" class="action-link link-docs">Apartment List</a>
+                <a href="RentAndBillForm.php" class="action-link link-billing active">Rent and Bills</a>
+                <a href="Rent_list.php" class="action-link link-rent">View Rent List</a>
+                <a href="Schedule_create.php" class="action-link link-schedule-create">Create Schedule</a>
+                <a href="scheduleInfo.php" class="action-link link-schedule-details">🗓️ Schedule Details</a>
             </section>
         </nav>
 
@@ -359,14 +331,11 @@ $conn->close();
                 </form>
             </div>
         </main>
-    </div> 
+    </div>
 
     <script>
-        // Pass the tenant details from PHP to JavaScript
         const tenantDetails = <?php echo json_encode($tenantDetails); ?>;
-
         document.addEventListener('DOMContentLoaded', function() {
-            // Set default billing date to today
             const today = new Date();
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -383,7 +352,6 @@ $conn->close();
             function calculateTotal() {
                 const getNumberValue = (id) => {
                     const el = document.getElementById(id);
-                    // Treat empty string as 0 for calculation
                     const value = parseFloat(el.value);
                     return isNaN(value) ? 0 : value;
                 };
@@ -393,14 +361,11 @@ $conn->close();
                 const water = getNumberValue('water_bill');
                 const utility = getNumberValue('utility_bill');
                 const guard = getNumberValue('guard_bill');
-
                 const total = rent + previousDue + water + utility + guard;
-
                 totalAmountEl.textContent = `৳${total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             }
 
             apartmentSelect.addEventListener('change', function() {
-                // ✅ FIXED: Clear previous error/success messages when changing selection
                 const successMessage = document.querySelector('.message');
                 const errorMessage = document.querySelector('.error');
                 if (successMessage) successMessage.style.display = 'none';
@@ -424,11 +389,9 @@ $conn->close();
                         tenantIdInput.value = '';
                     }
                 }
-                // Recalculate total when apartment changes
                 calculateTotal();
             });
 
-            // Add event listeners for real-time calculation
             billComponents.forEach(input => {
                 input.addEventListener('input', calculateTotal);
             });
