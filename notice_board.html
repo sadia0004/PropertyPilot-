@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tenant Notice Board</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-blue: #2563EB; /* Tailwind blue-600, a strong, vibrant blue */
+      --secondary-green: #10B981; /* Tailwind green-500 */
+      --accent-purple: #8B5CF6; /* Tailwind purple-500 */
+      --text-dark: #1F2937; /* Tailwind gray-800 */
+      --text-medium: #4B5563; /* Tailwind gray-600 */
+      --text-light: #6B7280; /* Tailwind gray-500 */
+      --bg-light: #F9FAFB; /* Tailwind gray-50 */
+      --card-bg: #FFFFFF; /* Pure white for cards */
+      --border-color: #E5E7EB; /* Tailwind gray-200 */
+      --shadow-color: rgba(0, 0, 0, 0.08);
+      --hover-shadow-color: rgba(0, 0, 0, 0.12);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-image: url(image/Receipt.jpg); /* Ensure this path is correct */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed; /* Keeps background fixed when scrolling */
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* Align content to the top */
+      min-height: 100vh;
+      padding: 40px 20px; /* Add padding for overall spacing */
+      box-sizing: border-box; /* Include padding in element's total width and height */
+    }
+
+    .main-container {
+      max-width: 800px; /* Wider container for more content */
+      width: 100%;
+      background-color: var(--card-bg);
+      box-shadow: 0 15px 40px var(--shadow-color); /* More pronounced shadow */
+      border-radius: 1.5rem; /* Larger border-radius for softer look */
+      padding: 2.5rem 3rem; /* Increased padding inside the container */
+      border: 1px solid var(--border-color); /* Subtle border */
+    }
+
+    .header-title {
+      font-size: 2.5rem; /* Larger main title */
+      font-weight: 800; /* Extra bold */
+      color: var(--primary-blue);
+      margin-bottom: 2.5rem; /* More space below title */
+      position: relative;
+      padding-bottom: 10px;
+    }
+
+    .header-title::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background-color: var(--primary-blue);
+      border-radius: 2px;
+    }
+
+    .schedule-card {
+      background-color: var(--bg-light); /* Lighter background for cards */
+      border: 1px solid var(--border-color);
+      border-radius: 1rem; /* Softer card corners */
+      padding: 1.5rem; /* Good padding inside cards */
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Softer shadow for cards */
+      transition: all 0.3s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem; /* Space between card sections */
+    }
+
+    .schedule-card:hover {
+      box-shadow: 0 8px 25px var(--hover-shadow-color); /* More pronounced shadow on hover */
+      transform: translateY(-5px); /* Lift effect on hover */
+    }
+
+    .card-title {
+      font-size: 1.6rem; /* Larger event description */
+      font-weight: 700;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .card-title i {
+      margin-right: 0.75rem;
+      color: var(--primary-blue); /* Icon color */
+    }
+
+    .card-meta {
+      font-size: 0.95rem;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-meta i {
+        color: var(--text-medium);
+    }
+
+    .meeting-type-badge {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.4rem 0.9rem;
+      border-radius: 9999px; /* Full rounded for pill shape */
+      color: white;
+      text-transform: capitalize;
+    }
+
+    .meeting-type-badge.in-person {
+      background-color: var(--secondary-green);
+    }
+
+    .meeting-type-badge.online {
+      background-color: var(--accent-purple);
+    }
+
+    .card-details {
+      font-size: 1rem;
+      color: var(--text-medium);
+      line-height: 1.6; /* Better readability */
+    }
+
+    .card-details strong {
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    .card-details a {
+      color: var(--primary-blue);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .card-details a:hover {
+      text-decoration: underline;
+      color: #1D4ED8; /* Darker blue on hover */
+    }
+    .card-details a i {
+        margin-right: 0.4rem;
+    }
+
+    .empty-message {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 1.25rem;
+      margin-top: 2.5rem;
+      padding: 1.5rem;
+      border: 2px dashed var(--border-color);
+      border-radius: 1rem;
+      background-color: var(--bg-light);
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <div class="main-container">
+    <h2 class="header-title text-center">
+      <i class="fa-solid fa-clipboard-list mr-3"></i> Tenant Notice Board
+    </h2>
+
+    <div id="scheduleContainer" class="space-y-6">
+      </div>
+
+    <div id="emptyMessage" class="empty-message hidden">
+      <p><i class="fa-solid fa-bell-slash mr-2"></i> No new notices available yet.</p>
+      <p class="text-base mt-2">Check back later for updates from your landlord!</p>
+    </div>
+  </div>
+
+<script>
+  // --- Dummy Data (for demonstration) ---
+  // This array ensures there's always some data to display,
+  // making it visible from any device/browser without needing localStorage setup.
+  const dummySchedules = [
+    {
+      tenant: "Tasdik Rayet",
+      description: "Monthly Rent Payment Reminder",
+      date: "2025-07-28",
+      time: "Anytime",
+      meetingType: "notice", // Using 'notice' type for general announcements
+      details: "Please ensure your rent payment is submitted by the 5th of the month to avoid late fees. You can pay via bank transfer or at the office.",
+      icon: "fa-solid fa-coins" // Custom icon for this notice
+    },
+    {
+      tenant: "Tasdik Rayet",
+      description: "Building Maintenance Announcement",
+      date: "2025-08-05",
+      time: "9:00 AM - 1:00 PM",
+      meetingType: "notice",
+      details: "Scheduled general maintenance of common areas including corridor cleaning and elevator inspection. Please expect some noise during these hours.",
+      icon: "fa-solid fa-screwdriver-wrench"
+    },
+    {
+      tenant: "Sadia Ahmed", // This schedule will only show if Sadia Ahmed is logged in
+      description: "Meeting with Property Manager",
+      date: "2025-07-29",
+      time: "2:00 PM",
+      meetingType: "in-person",
+      address: "Property Management Office, Ground Floor"
+    },
+    {
+      tenant: "Nahid Islam", // This schedule will only show if Nahid Islam is logged in
+      description: "Upcoming Pest Control Service",
+      date: "2025-08-10",
+      time: "10:00 AM",
+      meetingType: "online", // Using online just for variety, could be 'in-person'
+      link: "https://example.com/pest-control-info",
+      details: "The building will undergo pest control. Please ensure all food items are stored securely and dispose of garbage properly."
+    }
+  ];
+  // --- End Dummy Data ---
+
+
+  const tenant = JSON.parse(localStorage.getItem('loggedInUser'));
+
+  // Uncomment the following block in a real application for authentication:
+  /*
+  if (!tenant || tenant.role !== 'tenant') {
+    alert("You are not authorized to view this page.");
+    window.location.href = 'login.html'; // Redirect to login page
+    return; // Stop script execution
+  }
+  */
+
+  const scheduleContainer = document.getElementById('scheduleContainer');
+  const emptyMessage = document.getElementById('emptyMessage');
+
+  // Load schedules from localStorage, or use dummy data if localStorage is empty
+  let allSchedules = JSON.parse(localStorage.getItem('sentSchedules'));
+
+  if (!allSchedules || allSchedules.length === 0) {
+    allSchedules = dummySchedules; // Use dummy data if localStorage is empty
+    // Optional: Save dummy data to localStorage for persistence across sessions
+    localStorage.setItem('sentSchedules', JSON.stringify(dummySchedules));
+  } else {
+    // Merge dummy data with existing localStorage data if you want to ensure
+    // dummy data is always present, even if other schedules exist.
+    // For this example, we'll just add the dummy data if localStorage was empty initially.
+  }
+
+  // Filter schedules relevant to the logged-in tenant (or "Tasdik Rayet" for demo if no real tenant)
+  const currentTenantName = tenant ? tenant.fullName : "Tasdik Rayet"; // Default to Tasdik for demo
+  const tenantSchedules = allSchedules.filter(item => item.tenant && item.tenant.toLowerCase() === currentTenantName.toLowerCase());
+
+  // Sort schedules by date, most recent first (or soonest upcoming if "notice" type is dated)
+  tenantSchedules.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateA - dateB; // Ascending order (oldest first, so upcoming events appear higher)
+  });
+
+
+  if (tenantSchedules.length === 0) {
+    emptyMessage.classList.remove('hidden');
+  } else {
+    emptyMessage.classList.add('hidden'); // Hide empty message if there are schedules
+    tenantSchedules.forEach(schedule => {
+      const card = document.createElement('div');
+      card.className = 'schedule-card';
+
+      // Determine the icon based on meetingType or custom 'icon' property
+      let cardIcon = 'fa-solid fa-bullhorn'; // Default icon for notices
+      if (schedule.meetingType === 'in-person') {
+        cardIcon = 'fa-solid fa-person-walking';
+      } else if (schedule.meetingType === 'online') {
+        cardIcon = 'fa-solid fa-video';
+      }
+      if (schedule.icon) { // Use custom icon if provided in dummy data
+        cardIcon = schedule.icon;
+      }
+
+      card.innerHTML = `
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <h3 class="card-title"><i class="${cardIcon}"></i> ${schedule.description}</h3>
+            <p class="card-meta"><i class="fa-regular fa-calendar-days"></i> ${schedule.date} <i class="fa-regular fa-clock"></i> ${schedule.time}</p>
+          </div>
+          <div class="meeting-type-badge ${schedule.meetingType}">
+            ${schedule.meetingType === 'in-person' ? 'In-Person' : schedule.meetingType === 'online' ? 'Online' : 'Notice'}
+          </div>
+        </div>
+
+        <div class="card-details">
+          ${schedule.meetingType === 'in-person' && schedule.address
+            ? `<p><strong><i class="fa-solid fa-location-dot"></i> Address:</strong> ${schedule.address}</p>`
+            : schedule.meetingType === 'online' && schedule.link
+            ? `<p><strong><i class="fa-solid fa-link"></i> Meeting Link:</strong> <a href="${schedule.link}" target="_blank">${schedule.link}</a></p>`
+            : schedule.details // For 'notice' type or general details
+            ? `<p>${schedule.details}</p>`
+            : ''
+          }
+        </div>
+      `;
+      scheduleContainer.appendChild(card);
+    });
+  }
+</script>
+</body>
+</html>

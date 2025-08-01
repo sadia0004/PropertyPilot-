@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monthly Rent Report</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #d5e4f4, #f7d9f3);
+    }
+  </style>
+</head>
+<body class="min-h-screen py-10 px-6">
+  <div class="max-w-7xl mx-auto bg-white rounded-2xl p-8 shadow-lg">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Monthly Rent List</h2>
+      <div class="flex gap-4 mt-4 md:mt-0">
+        <select id="filter-month" class="border border-gray-300 rounded px-3 py-2">
+          <option value="">Select Month</option>
+          <option value="07">July</option>
+          <option value="08">August</option>
+          <option value="09">September</option>
+        </select>
+        <select id="filter-year" class="border border-gray-300 rounded px-3 py-2">
+          <option value="">Select Year</option>
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm text-left text-gray-700">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2">Apartment No</th>
+            <th class="px-4 py-2">Tenant Name</th>
+            <th class="px-4 py-2">Total Rent (৳)</th>
+            <th class="px-4 py-2">Paid (৳)</th>
+            <th class="px-4 py-2">Due (৳)</th>
+            <th class="px-4 py-2">Month</th>
+            <th class="px-4 py-2">Year</th>
+          </tr>
+        </thead>
+        <tbody id="rent-table-body" class="bg-white divide-y">
+          <!-- Rows will be inserted dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-6 text-right">
+      <p class="text-lg font-semibold">Total Rent Collected: <span id="total-paid" class="text-green-600">৳0.00</span></p>
+    </div>
+  </div>
+
+  <script>
+    const rentData = [
+      { apt: "A1", name: "Anis Ahmed", total: 15000, paid: 15000, month: "07", year: "2025" },
+      { apt: "B2", name: "Mira Khan", total: 15000, paid: 10000, month: "07", year: "2025" },
+      { apt: "C3", name: "Rayhan Alam", total: 15000, paid: 15000, month: "08", year: "2025" },
+      { apt: "C3", name: "Rayhan Alam", total: 15000, paid: 15000, month: "07", year: "2025" },
+      { apt: "E2", name: "Mira Khan", total: 15000, paid: 10000, month: "07", year: "2025" },
+      { apt: "F3", name: "Raya Alam", total: 15000, paid: 15000, month: "08", year: "2025" },
+      { apt: "G4", name: "Rida Begum", total: 16000, paid: 16000, month: "08", year: "2024" },
+      { apt: "G4", name: "Jalil Mia", total: 16000, paid: 15000, month: "08", year: "2024" },
+       { apt: "H4", name: "Farida Begum", total: 16000, paid: 16000, month: "08", year: "2024" },
+    ];
+
+    const tbody = document.getElementById("rent-table-body");
+    const filterMonth = document.getElementById("filter-month");
+    const filterYear = document.getElementById("filter-year");
+    const totalPaidEl = document.getElementById("total-paid");
+
+    function renderTable() {
+      const month = filterMonth.value;
+      const year = filterYear.value;
+      tbody.innerHTML = "";
+      let totalPaid = 0;
+
+      rentData.forEach(item => {
+        if ((month === "" || item.month === month) && (year === "" || item.year === year)) {
+          const due = item.total - item.paid;
+          totalPaid += item.paid;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-4 py-2">${item.apt}</td>
+            <td class="px-4 py-2">${item.name}</td>
+            <td class="px-4 py-2">৳${item.total.toLocaleString()}</td>
+            <td class="px-4 py-2 text-green-600">৳${item.paid.toLocaleString()}</td>
+            <td class="px-4 py-2 text-red-500">৳${due.toLocaleString()}</td>
+            <td class="px-4 py-2">${item.month}</td>
+            <td class="px-4 py-2">${item.year}</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+
+      totalPaidEl.textContent = `৳${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+    }
+
+    filterMonth.addEventListener("change", renderTable);
+    filterYear.addEventListener("change", renderTable);
+
+    renderTable();
+  </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tenant Maintenance Requests</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <h1 class="text-3xl font-bold text-center mb-6 text-indigo-700">🛠️ Tenant Maintenance Requests</h1>
+  <div id="requestList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+  <script>
+    let requests = JSON.parse(localStorage.getItem("maintenanceRequests")) || [];
+    const container = document.getElementById("requestList");
+
+    function renderRequests() {
+      container.innerHTML = ""; // Clear before rendering
+      if (requests.length === 0) {
+        container.innerHTML = `<p class="text-center col-span-3 text-gray-600">No maintenance requests found.</p>`;
+        return;
+      }
+
+      requests.forEach((req, index) => {
+        const card = document.createElement("div");
+        card.className = "bg-white p-4 rounded-lg shadow border";
+
+        card.innerHTML = `
+          <h2 class="text-xl font-bold text-indigo-600 mb-2">${req.tenantName} (${req.unit})</h2>
+          <p><strong>Phone:</strong> ${req.phone}</p>
+          <p><strong>Email:</strong> ${req.email}</p>
+          <p><strong>Category:</strong> ${req.category}</p>
+          <p><strong>Description:</strong> ${req.description}</p>
+          <p><strong>Condition:</strong> <span class="text-red-600 font-semibold">${req.condition || 'Not specified'}</span></p>
+          <p><strong>Permission to Enter:</strong> ${req.permissionToEnter ? '✅ Yes' : '❌ No'}</p>
+          ${req.photo ? `<img src="${req.photo}" alt="Issue Photo" class="mt-2 w-full h-40 object-cover rounded">` : ''}
+
+          <div class="mt-4">
+            <label class="block font-medium mb-1">Landlord Response:</label>
+            <textarea class="w-full border p-2 rounded responseBox" rows="2" data-index="${index}">${req.response || ''}</textarea>
+            <button class="mt-2 bg-green-600 text-white px-4 py-1 rounded saveBtn" data-index="${index}">💾 Save</button>
+            ${req.response ? `<button class="mt-2 bg-red-500 text-white px-4 py-1 rounded ml-2 deleteBtn" data-index="${index}">🗑️ Remove</button>` : ''}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      // Save response
+      document.querySelectorAll('.saveBtn').forEach(button => {
+        button.addEventListener('click', function () {
+          const i = this.dataset.index;
+          const textarea = document.querySelector(`.responseBox[data-index="${i}"]`);
+          requests[i].response = textarea.value.trim();
+          localStorage.setItem("maintenanceRequests", JSON.stringify(requests));
+          alert("Response saved!");
+          renderRequests(); // Re-render to show Remove button
+        });
+      });
+
+      // Remove request
+      document.querySelectorAll('.deleteBtn').forEach(button => {
+        button.addEventListener('click', function () {
+          const i = this.dataset.index;
+          if (confirm("Are you sure you want to remove this resolved request?")) {
+            requests.splice(i, 1);
+            localStorage.setItem("maintenanceRequests", JSON.stringify(requests));
+            renderRequests();
+          }
+        });
+      });
+    }
+
+    // Initial render
+    renderRequests();
+  </script>
+</body>
+</html>
