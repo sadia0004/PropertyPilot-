@@ -128,7 +128,7 @@ if ($flash_message) {
         .top-right-user-info .logout-btn { background-color: #dc3545; color: <?php echo $textColor; ?>; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: 600; }
         .dashboard-content-wrapper { display: flex; flex-grow: 1; margin-top: 80px; height: calc(100vh - 80px); overflow: hidden; }
         .vertical-sidebar { display: flex; flex-direction: column; align-items: flex-start; background-color: <?php echo $primaryDark; ?>; padding: 20px 15px; color: <?php echo $textColor; ?>; z-index: 1000; width: 250px; height: 100%; overflow-y: hidden; }
-        .vertical-sidebar .nav-links a { color: <?php echo $textColor; ?>; text-decoration: none; width:100%; text-align: left; padding: 12px 15px; margin: 8px 0; font-weight: 600; font-size: 16px; border-radius: 8px; display: flex; align-items: center; gap: 10px; transition: background-color 0.3s ease; }
+        .vertical-sidebar .nav-links a { color: <?php echo $textColor; ?>; text-decoration: none; width:100%; text-align: left; padding: 8px 11px; margin: 6px 0; font-weight: 600; font-size: 16px; border-radius: 8px; display: flex; align-items: center; gap: 7px; transition: background-color 0.3s ease; }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: <?php echo $primaryAccent; ?>; }
         .vertical-sidebar .action-buttons { width: 100%; display: flex; flex-direction: column; gap: 7px; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); }
         .vertical-sidebar .action-buttons h3 { color: <?php echo $textColor; ?>; font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
@@ -179,6 +179,7 @@ if ($flash_message) {
     <div class="dashboard-content-wrapper">
         <nav class="vertical-sidebar">
             <div class="nav-links">
+                <a href="landlord_dashboard.php">Dashboard</a>
                 <a href="profile.html">Profile</a>
                 <a href="propertyInfo.php">Add Property Info</a>
                 <a href="notifications.html">Notifications</a>

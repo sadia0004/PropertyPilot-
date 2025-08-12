@@ -312,7 +312,7 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
     <?php if ($userRole === 'tenant'): ?>
         <nav class="vertical-sidebar">
           <div class="nav-links">
-            <a href="profile.html" class="active">Profile</a>
+            <a href="profile.php" class="active">Profile</a>
             <a href="Rent_Pay.html">Rent & Bills</a>
             <a href="notice_board.html">Notifications</a>
             <a href="maintenance.html">Maintenance</a>
@@ -325,7 +325,7 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
     <?php elseif ($userRole === 'landlord'): ?>
         <nav class="vertical-sidebar">
           <div class="nav-links">
-            <a href="profile.html" class="active">Profile</a>
+            <a href="profile.php" class="active">Profile</a>
             <a href="propertyInfo.php">Add Property Info</a>
             <a href="notifications.html">Notifications</a>
           </div>

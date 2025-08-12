@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Profile - PropertyPilot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="profile.css">
+</head>
+<body>
+    <header class="main-top-navbar">
+        <div class="brand">
+            <img src="image/logo.png" alt="Logo" /> PropertyPilot
+        </div>
+        <div class="top-right-user-info">
+            <span><?php echo htmlspecialchars($_SESSION['fullName']); ?></span>
+            <img class="user-photo" src="<?php echo htmlspecialchars($_SESSION['profilePhoto'] ?: 'image/default-avatar.png'); ?>" alt="Profile">
+            <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
+    </header>
+
+    <div class="dashboard-content-wrapper">
+        <nav class="vertical-sidebar">
+            <a href="landlord_dashboard.php">Dashboard</a>
+            <a href="profile.php" class="active">My Profile</a>
+            <a href="notice_board.html">Notifications</a>
+            <a href="scheduleInfo.php">Schedules</a>
+        </nav>
+
+        <main>
+            <div class="profile-container">
+                <div class="profile-header">
+                    <img src="<?php echo htmlspecialchars($profilePhoto); ?>" alt="Current Profile Photo" class="avatar">
+                    <h2>My Profile</h2>
+                </div>
+
+                <?php if (!empty($message)): ?>
+                    <div class="message <?php echo $message_type; ?>"><?php echo $message; ?></div>
+                <?php endif; ?>
+
+                <form method="POST" action="profile.php" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($user['fullName']); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phoneNumber">Phone Number</label>
+                            <input type="text" id="phoneNumber" name="phoneNumber" value="<?php echo htmlspecialchars($user['phoneNumber']); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nationalId">National ID</label>
+                            <input type="text" id="nationalId" value="<?php echo htmlspecialchars($user['nationalId']); ?>" readonly>
+                        </div>
+                    </div>
+                    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profilePhoto">Change Profile Photo</label>
+                            <input type="file" id="profilePhoto" name="profilePhoto">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newPassword">New Password (leave blank to keep current)</label>
+                            <input type="password" id="newPassword" name="newPassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
