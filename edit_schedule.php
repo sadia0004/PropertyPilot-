@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'landlord') {
 }
 $landlord_id = $_SESSION['user_id'];
 
-// CHANGED: Get 'scheduleID' from the URL parameter
+// Get 'scheduleID' from the URL parameter
 $schedule_id = filter_input(INPUT_GET, 'scheduleID', FILTER_VALIDATE_INT);
 if (!$schedule_id) {
     header("Location: scheduleInfo.php");
@@ -36,19 +36,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $time = $_POST['time'] ?? '';
     $meetingType = $_POST['meetingType'] ?? 'In-Person';
     $description = $_POST['EventDescription'] ?? '';
-    // CHANGED: Get 'scheduleID' from the hidden form field
     $posted_schedule_id = filter_input(INPUT_POST, 'scheduleID', FILTER_VALIDATE_INT);
 
     if (empty($date) || empty($time) || !$posted_schedule_id) {
         $errorMsg = "❌ Date and Time are required.";
     } else {
-        // CHANGED: The WHERE clause now uses 'scheduleID'
         $updateQuery = "UPDATE meeting_schedule SET date = ?, time = ?, meetingType = ?, EventDescription = ? WHERE scheduleID = ? AND landlord_id = ?";
         $stmt = $conn->prepare($updateQuery);
         $stmt->bind_param("ssssii", $date, $time, $meetingType, $description, $posted_schedule_id, $landlord_id);
         
         if ($stmt->execute()) {
-            $_SESSION['success_message'] = "✅ Schedule updated successfully!";
+            $_SESSION['flash_message'] = ['type' => 'success', 'text' => '✅ Schedule updated successfully!'];
             header("Location: scheduleInfo.php");
             exit();
         } else {
@@ -59,7 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Fetch the existing schedule data to pre-fill the form
-// CHANGED: The WHERE clause now uses 'scheduleID'
 $fetchQuery = "SELECT * FROM meeting_schedule WHERE scheduleID = ? AND landlord_id = ?";
 $stmt = $conn->prepare($fetchQuery);
 $stmt->bind_param("ii", $schedule_id, $landlord_id);
@@ -70,7 +67,6 @@ $stmt->close();
 $conn->close();
 
 if (!$scheduleData) {
-    // Redirect if schedule doesn't exist or belong to the landlord
     header("Location: scheduleInfo.php");
     exit();
 }
@@ -80,20 +76,61 @@ if (!$scheduleData) {
 <head>
     <meta charset="UTF-8" />
     <title>Edit Schedule - PropertyPilot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Your CSS styles remain the same */
-        body { font-family: sans-serif; margin: 0; background-color: #f0f4ff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f0f4ff; }
         main { padding: 2rem; }
-        .form-container { max-width: 700px; margin: auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-container { max-width: 700px; margin: auto; background: #fff; padding: 2rem 2.5rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #021934; }
         h3 { text-align: center; color: #555; font-weight: normal; margin-top: -10px; margin-bottom: 2rem; }
         form { display: flex; flex-wrap: wrap; gap: 20px; }
         .form-field-group { flex-basis: 100%; }
         .half-width { flex-basis: calc(50% - 10px); }
         label { display: block; margin-bottom: 8px; font-weight: bold; }
-        input[type="date"], input[type="time"], textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
-        button { width: 100%; padding: 15px; font-size: 1.1rem; color: #fff; background-color: #28a745; border: none; border-radius: 5px; cursor: pointer; }
+        input[type="date"], input[type="time"], textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; box-sizing: border-box; }
         .error { padding: 1rem; background-color: #f8d7da; color: #721c24; border-radius: 5px; margin-bottom: 1.5rem; text-align: center; }
+
+        /* --- STYLES FOR ACTION BUTTONS --- */
+        .form-actions {
+            flex-basis: 100%;
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn i {
+            margin-right: 8px;
+        }
+
+        /* Update button (Green) */
+        .btn-update {
+            background-color: #28a745;
+            flex-grow: 2; /* Takes more space */
+        }
+        .btn-update:hover {
+            background-color: #218838;
+        }
+        
+        /* Back button (Grey) */
+        .btn-back {
+            background-color: #6c757d;
+        }
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -132,7 +169,10 @@ if (!$scheduleData) {
                     <textarea id="EventDescription" name="EventDescription" rows="4"><?php echo htmlspecialchars($scheduleData['EventDescription']); ?></textarea>
                 </div>
                 
-                <button type="submit">Update Schedule</button>
+                <div class="form-actions">
+                    <a href="scheduleInfo.php" class="btn btn-back"><i class="fas fa-arrow-left"></i> Go Back</a>
+                    <button type="submit" class="btn btn-update"><i class="fas fa-save"></i> Update Schedule</button>
+                </div>
             </form>
         </div>
     </main>
