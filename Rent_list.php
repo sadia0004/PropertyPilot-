@@ -226,7 +226,7 @@ $conn->close();
             <section class="action-buttons">
                 <h3>Quick Actions</h3>
                 <a href="add_tenant.php" class="action-link link-tenant">+ Add Tenant</a>
-                <a href="view_tenants.php" class="action-link link-tenant-list">View Tenant List</a>
+                <a href="tenant_List.php" class="action-link link-tenant-list">View Tenant List</a>
                 <a href="apartmentList.php" class="action-link link-docs">Apartment List</a>
                 <a href="RentAndBillForm.php" class="action-link link-billing">Rent and Bills</a>
                 <a href="Rent_list.php" class="action-link link-rent active">View Rent List</a>

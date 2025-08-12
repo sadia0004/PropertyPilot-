@@ -171,7 +171,7 @@ $brandColors = [
         <div class="action-buttons">
             <h3>Quick Actions</h3>
             <a href="add_tenant.php" class="action-link link-add-tenant">+ Add Tenant</a>
-            <a href="view_tenants.php" class="action-link link-view-tenants">View Tenant List</a>
+            <a href="tenant_List.php" class="action-link link-view-tenants">View Tenant List</a>
             <a href="apartmentList.php" class="action-link link-apartment-list active">Apartment List</a>
             <a href="RentAndBillForm.php" class="action-link link-rent-bills">Rent and Bills</a>
             <a href="Rent_list.php" class="action-link link-rent-list">View Rent List</a>
