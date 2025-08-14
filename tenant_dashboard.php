@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'tenant') {
 $userId = $_SESSION['user_id'];
 
 // --- Define Color Palette for Tenant Dashboard ---
-$primaryDark = '#0A2342'; // A deep, professional blue
+$primaryDark = '#1B3C53'; // UPDATED COLOR
 $primaryAccent = '#2CA58D'; // A contrasting teal for highlights
 $textColor = '#E0E0E0'; // Soft white for text
 $secondaryBackground = '#F0F2F5'; // Light grey for the main content area
@@ -168,7 +168,7 @@ $conn->close();
     <nav class="vertical-sidebar">
       <div class="nav-links">
         <a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="/profile.php"><i class="fas fa-user-circle"></i> Profile</a>
+        <a href="tprofile.php"><i class="fas fa-user-circle"></i> Profile</a>
         <a href="#"><i class="fas fa-file-invoice-dollar"></i> Rent & Bills</a>
         <a href="#"><i class="fas fa-bell"></i> Notifications</a>
         <a href="#"><i class="fas fa-tools"></i> Maintenance</a>
