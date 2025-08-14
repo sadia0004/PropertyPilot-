@@ -171,7 +171,7 @@ $conn->close();
         <a href="tprofile.php"><i class="fas fa-user-circle"></i> Profile</a>
         <a href="#"><i class="fas fa-file-invoice-dollar"></i> Rent & Bills</a>
         <a href="#"><i class="fas fa-bell"></i> Notifications</a>
-        <a href="#"><i class="fas fa-tools"></i> Maintenance</a>
+        <a href="maintenanceRequest.php"><i class="fas fa-tools"></i> Maintenance</a>
       </div>
     </nav>
 

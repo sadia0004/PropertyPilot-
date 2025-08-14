@@ -15,7 +15,7 @@ $fullName_session = $_SESSION['fullName'] ?? 'Tenant';
 $profilePhoto_session = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
 // --- Define Color Palette for Tenant Dashboard ---
-$primaryDark = '#0A2342'; // A deep, professional blue
+$primaryDark = '#1B3C53'; // UPDATED COLOR
 $primaryAccent = '#2CA58D'; // A contrasting teal for highlights
 $textColor = '#E0E0E0'; // Soft white for text
 $secondaryBackground = '#F0F2F5'; // Light grey for the main content area
@@ -38,90 +38,95 @@ if ($conn->connect_error) {
 // --- Handle Form Submission (POST Request) ---
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fullName = trim($_POST['fullName']);
+    $email = trim($_POST['email']);
     $phoneNumber = trim($_POST['phoneNumber']);
+    $nationalId = trim($_POST['nationalId']);
+    $profession = trim($_POST['profession']);
     $newPassword = $_POST['newPassword'];
     $confirmPassword = $_POST['confirmPassword'];
 
     // Basic Validation
-    if (empty($fullName) || empty($phoneNumber)) {
-        $message = "Full Name and Phone Number cannot be empty.";
+    if (empty($fullName) || empty($phoneNumber) || empty($email) || empty($nationalId)) {
+        $message = "Please fill all required fields.";
+        $message_type = 'error';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $message = "Invalid email format.";
         $message_type = 'error';
     } else {
-        $update_fields = [];
-        $params = [];
-        $types = "";
+        $conn->begin_transaction();
+        try {
+            // --- Update Users Table ---
+            $update_fields_users = [];
+            $params_users = [];
+            $types_users = "";
 
-        // Prepare fields for update
-        $update_fields[] = "fullName = ?";
-        $params[] = $fullName;
-        $types .= "s";
+            $update_fields_users[] = "fullName = ?"; $params_users[] = $fullName; $types_users .= "s";
+            $update_fields_users[] = "email = ?"; $params_users[] = $email; $types_users .= "s";
+            $update_fields_users[] = "phoneNumber = ?"; $params_users[] = $phoneNumber; $types_users .= "s";
+            $update_fields_users[] = "nationalId = ?"; $params_users[] = $nationalId; $types_users .= "s";
 
-        $update_fields[] = "phoneNumber = ?";
-        $params[] = $phoneNumber;
-        $types .= "s";
-
-        // Handle Password Change
-        if (!empty($newPassword)) {
-            if ($newPassword === $confirmPassword) {
-                $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-                $update_fields[] = "password = ?";
-                $params[] = $hashedPassword;
-                $types .= "s";
-            } else {
-                $message = "Passwords do not match.";
-                $message_type = 'error';
-            }
-        }
-
-        // Handle Profile Photo Upload
-        if (isset($_FILES['profilePhoto']) && $_FILES['profilePhoto']['error'] == 0) {
-            $uploadDir = 'uploads/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-            $fileName = time() . '_' . basename($_FILES['profilePhoto']['name']);
-            $targetFilePath = $uploadDir . $fileName;
-            
-            $allowTypes = array('jpg','png','jpeg','gif','webp');
-            $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
-
-            if (in_array($fileType, $allowTypes)) {
-                if (move_uploaded_file($_FILES['profilePhoto']['tmp_name'], $targetFilePath)) {
-                    $update_fields[] = "profilePhoto = ?";
-                    $params[] = $targetFilePath;
-                    $types .= "s";
+            if (!empty($newPassword)) {
+                if ($newPassword === $confirmPassword) {
+                    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+                    $update_fields_users[] = "password = ?";
+                    $params_users[] = $hashedPassword;
+                    $types_users .= "s";
                 } else {
-                    $message = "Sorry, there was an error uploading your file.";
-                    $message_type = 'error';
+                    throw new Exception("Passwords do not match.");
                 }
-            } else {
-                $message = 'Sorry, only JPG, JPEG, PNG, GIF, & WEBP files are allowed.';
-                $message_type = 'error';
             }
-        }
 
-        // If no errors, proceed with database update
-        if (empty($message)) {
-            $params[] = $tenant_id;
-            $types .= "i";
+            if (isset($_FILES['profilePhoto']) && $_FILES['profilePhoto']['error'] == 0) {
+                $uploadDir = 'uploads/';
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+                $fileName = time() . '_' . basename($_FILES['profilePhoto']['name']);
+                $targetFilePath = $uploadDir . $fileName;
+                $allowTypes = array('jpg','png','jpeg','gif','webp');
+                $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
+
+                if (in_array($fileType, $allowTypes)) {
+                    if (move_uploaded_file($_FILES['profilePhoto']['tmp_name'], $targetFilePath)) {
+                        $update_fields_users[] = "profilePhoto = ?";
+                        $params_users[] = $targetFilePath;
+                        $types_users .= "s";
+                    } else {
+                        throw new Exception("Sorry, there was an error uploading your file.");
+                    }
+                } else {
+                    throw new Exception('Sorry, only JPG, JPEG, PNG, GIF, & WEBP files are allowed.');
+                }
+            }
+
+            if (!empty($update_fields_users)) {
+                $params_users[] = $tenant_id;
+                $types_users .= "i";
+                $sql_users = "UPDATE users SET " . implode(", ", $update_fields_users) . " WHERE id = ?";
+                $stmt_users = $conn->prepare($sql_users);
+                $stmt_users->bind_param($types_users, ...$params_users);
+                $stmt_users->execute();
+                $stmt_users->close();
+            }
+
+            // --- Update Tenants Table ---
+            $stmt_tenants = $conn->prepare("UPDATE tenants SET profession = ? WHERE tenant_id = ?");
+            $stmt_tenants->bind_param("si", $profession, $tenant_id);
+            $stmt_tenants->execute();
+            $stmt_tenants->close();
+
+            $conn->commit();
+            $message = "Profile updated successfully!";
+            $message_type = 'success';
             
-            $sql = "UPDATE users SET " . implode(", ", $update_fields) . " WHERE id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param($types, ...$params);
-
-            if ($stmt->execute()) {
-                $message = "Profile updated successfully!";
-                $message_type = 'success';
-                // Update session variables to reflect changes immediately
-                $_SESSION['fullName'] = $fullName;
-                if (isset($targetFilePath)) {
-                    $_SESSION['profilePhoto'] = $targetFilePath;
-                }
-            } else {
-                $message = "Error updating profile: " . $conn->error;
-                $message_type = 'error';
+            // Update session variables
+            $_SESSION['fullName'] = $fullName;
+            if (isset($targetFilePath)) {
+                $_SESSION['profilePhoto'] = $targetFilePath;
             }
-            $stmt->close();
+
+        } catch (Exception $e) {
+            $conn->rollback();
+            $message = $e->getMessage();
+            $message_type = 'error';
         }
     }
 }
@@ -223,7 +228,7 @@ $profilePhoto = (!empty($user['profilePhoto']) && file_exists($user['profilePhot
         <nav class="vertical-sidebar">
             <div class="nav-links">
                 <a href="tenant_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                <a href="profile.php" class="active"><i class="fas fa-user-circle"></i> Profile</a>
+                <a href="tprofile.php" class="active"><i class="fas fa-user-circle"></i> Profile</a>
                 <a href="rent_bills.php"><i class="fas fa-file-invoice-dollar"></i> Rent & Bills</a>
                 <a href="notifications.php"><i class="fas fa-bell"></i> Notifications</a>
                 <a href="maintenance.php"><i class="fas fa-tools"></i> Maintenance</a>
@@ -241,7 +246,7 @@ $profilePhoto = (!empty($user['profilePhoto']) && file_exists($user['profilePhot
                     <div class="message <?php echo $message_type; ?>"><?php echo $message; ?></div>
                 <?php endif; ?>
 
-                <form method="POST" action="profile.php" enctype="multipart/form-data">
+                <form method="POST" action="tprofile.php" enctype="multipart/form-data">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="fullName">Full Name</label>
@@ -249,23 +254,23 @@ $profilePhoto = (!empty($user['profilePhoto']) && file_exists($user['profilePhot
                         </div>
                         <div class="form-group">
                             <label for="email">Email Address</label>
-                            <input type="email" id="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
+                            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="phoneNumber">Phone Number</label>
-                            <input type="text" id="phoneNumber" name="phoneNumber" value="<?php echo htmlspecialchars($user['phoneNumber']); ?>" required>
+                            <input type="text" id="phoneNumber" name="phoneNumber" value="<?php echo htmlspecialchars($user['phoneNumber'] ?? ''); ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="nationalId">National ID</label>
-                            <input type="text" id="nationalId" value="<?php echo htmlspecialchars($user['nationalId']); ?>" readonly>
+                            <input type="text" id="nationalId" name="nationalId" value="<?php echo htmlspecialchars($user['nationalId']); ?>" required>
                         </div>
                     </div>
                      <div class="form-row">
                         <div class="form-group">
                             <label for="profession">Profession</label>
-                            <input type="text" id="profession" value="<?php echo htmlspecialchars($user['profession'] ?? 'Not Provided'); ?>" readonly>
+                            <input type="text" id="profession" name="profession" value="<?php echo htmlspecialchars($user['profession'] ?? ''); ?>">
                         </div>
                     </div>
                     <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
