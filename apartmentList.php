@@ -46,7 +46,7 @@ $brandColors = [
     'primaryDark' => '#021934', 'primaryAccent' => '#2c5dbd', 'textColor' => '#f0f4ff',
     'secondaryBackground' => '#f0f4ff', 'actionAdd' => '#28a745', 'actionBilling' => '#ffc107',
     'actionViewRentList' => '#17a2b8', 'actionViewTenantList' => '#6f42c1',
-    'actionApartmentList' => '#6c757d', 'actionScheduleCreate' => '#e83e8c',
+    'actionApartmentList' => '#6c757d', 'actionScheduleCreate' => '#832d31ff',
     'actionScheduleDetails' => '#fd7e14', 'actionMaintenance' => '#dc3545'
 ];
 ?>

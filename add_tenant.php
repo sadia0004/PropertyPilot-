@@ -31,7 +31,7 @@ $actionBilling = '#ffc107';
 $actionViewRentList = '#17a2b8';
 $actionViewTenantList = '#6f42c1';
 $actionApartmentList = '#6c757d';
-$actionScheduleCreate = '#e83e8c';
+$actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
 
 // Initialize messages
@@ -207,9 +207,9 @@ $conn->close();
           z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: hidden;
         }
         .vertical-sidebar .nav-links a {
-          color: var(--text-color); text-decoration: none; width: 100%; text-align: left; padding: 12px 15px;
+          color: var(--text-color); text-decoration: none; width: 100%; text-align: left; padding: 9px 12px;
           margin: 8px 0; font-weight: 600; font-size: 16px; border-radius: 8px;
-          transition: background-color 0.3s ease; display: flex; align-items: center; gap: 10px;
+          transition: background-color 0.3s ease; display: flex; align-items: center; ;
         }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: #2c5dbd; }
         .vertical-sidebar .action-buttons {

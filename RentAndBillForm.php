@@ -33,7 +33,7 @@ $actionBilling = '#ffc107';
 $actionViewRentList = '#17a2b8';
 $actionViewTenantList = '#6f42c1';
 $actionApartmentList = '#6c757d';
-$actionScheduleCreate = '#e83e8c';
+$actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
 
 // Initialize messages

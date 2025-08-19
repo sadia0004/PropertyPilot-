@@ -28,7 +28,7 @@ $actionBilling = '#ffc107';   // Yellow for 'Rent & Bills'
 $actionViewRentList = '#17a2b8';  // Teal for 'View Rent List'
 $actionViewTenantList = '#6f42c1'; // Purple for 'View Tenant List'
 $actionApartmentList = '#6c757d';// Grey for 'Apartment List'
-$actionScheduleCreate = '#e83e8c';   // Magenta for 'Create Schedule'
+$actionScheduleCreate = '#832d31ff';   // Magenta for 'Create Schedule'
 $actionScheduleDetails = '#fd7e14'; // Orange for 'Schedule Details'
 $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
 
