@@ -30,7 +30,7 @@ $actionBilling = '#ffc107';
 $actionViewRentList = '#17a2b8';
 $actionViewTenantList = '#6f42c1';
 $actionApartmentList = '#6c757d';
-$actionScheduleCreate = '#e83e8c';
+$actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
 $actionMaintenance = '#dc3545';
 // =================================================================
@@ -180,7 +180,7 @@ $conn->close();
                 <a href="landlord_dashboard.php">Dashboard</a>
                 <a href="profile.php">Profile</a>
                 <a href="propertyInfo.php" class="active">Add Property Info</a>
-                <a href="notifications.html">Notifications</a>
+                <a href="notifications.html">Maintanance</a>
             </div>
             <section class="action-buttons">
                 <h3>Quick Actions</h3>

@@ -184,7 +184,7 @@ $conn->close();
         <a href="tenant_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <a href="tprofile.php"><i class="fas fa-user-circle"></i> Profile</a>
         <a href="rentTransaction.php"><i class="fas fa-file-invoice-dollar"></i> Rent & Bills</a>
-        <a href="#"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="tenant_notifications.php"><i class="fas fa-bell"></i> Notifications</a>
         <a href="maintenanceRequest.php"><i class="fas fa-tools"></i> Maintenance</a>
       </div>
     </nav>
