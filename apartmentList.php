@@ -69,15 +69,15 @@ $brandColors = [
         .vertical-sidebar { display: flex; flex-direction: column; background-color: <?php echo $brandColors['primaryDark']; ?>; padding: 20px 15px; color: <?php echo $brandColors['textColor']; ?>; box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2); z-index: 1000; flex-shrink: 0; width: 250px; overflow-y: auto; }
         
         /* Main Navigation Links */
-        .vertical-sidebar .nav-links a { color: <?php echo $brandColors['textColor']; ?>; text-decoration: none; padding: 8px 10px; margin: 8px 0; font-weight: 600; border-radius: 8px; transition: background-color 0.3s ease; display: flex; align-items: center; gap: 10px; }
+        .vertical-sidebar .nav-links a { color: <?php echo $brandColors['textColor']; ?>; text-decoration: none; padding: 8px 11px; margin: 8px 0; font-weight: 600; border-radius: 8px; transition: background-color 0.3s ease; display: flex; align-items: center; }
         .vertical-sidebar .nav-links a:hover,
         .vertical-sidebar .nav-links a.active { background-color: <?php echo $brandColors['primaryAccent']; ?>; }
 
         /* Action Buttons Section - Corrected CSS */
-        .vertical-sidebar .action-buttons { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 15px; }
+        .vertical-sidebar .action-buttons { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 11px; }
         .vertical-sidebar .action-buttons h3 { color: <?php echo $brandColors['textColor']; ?>; font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
         .vertical-sidebar .action-link {
-            width: 100%; padding: 9px 15px; border-radius: 8px; color: <?php echo $brandColors['textColor']; ?>;
+            width: 90%; padding: 9px 15px; border-radius: 8px; color: <?php echo $brandColors['textColor']; ?>;
             font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center;
             gap: 10px; text-decoration: none; margin: 7px 0;
             transition: background-color 0.3s ease, transform 0.2s ease;

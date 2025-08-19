@@ -142,11 +142,11 @@ $conn->close();
         .dashboard-content-wrapper { display: flex; flex-grow: 1; margin-top: 80px; height: calc(100vh - 80px); overflow: hidden; }
         .vertical-sidebar {
           display: flex; flex-direction: column; align-items: flex-start; background-color: #021934;
-          padding: 20px 15px; color: #f0f4ff; box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+          padding: 18px 15px; color: #f0f4ff; box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
           z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: hidden;
         }
         .vertical-sidebar .nav-links a {
-          color: #f0f4ff; text-decoration: none; width: 100%; text-align: left; padding: 12px 15px;
+          color: #f0f4ff; text-decoration: none; width: 100%; text-align: left; padding: 9px 12px;
           margin: 8px 0; font-weight: 600; font-size: 16px; border-radius: 8px;
           transition: background-color 0.3s ease; display: flex; align-items: center; gap: 10px;
         }
@@ -168,7 +168,7 @@ $conn->close();
         }
         .vertical-sidebar .action-link {
           width: calc(100% - 30px);
-          padding: 8px 15px; /* Reduced vertical padding */
+          padding: 8px 12px; /* Reduced vertical padding */
           border-radius: 8px;
           color: #f0f4ff;
           font-weight: 600;
@@ -177,7 +177,6 @@ $conn->close();
           display: flex;
           align-items: center;
           justify-content: flex-start;
-          gap: 10px;
           text-decoration: none;
           transition: all 0.2s ease;
         }

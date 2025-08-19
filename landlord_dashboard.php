@@ -327,7 +327,7 @@ $actionMaintenance = '#dc3545';// Red for 'Maintenance Requests'
           <div class="nav-links">
             <a href="profile.php" class="active">Profile</a>
             <a href="propertyInfo.php">Add Property Info</a>
-            <a href="notifications.html">Notifications</a>
+            <a href="maintanance.php">Maintanance</a>
           </div>
 
           <section class="action-buttons">

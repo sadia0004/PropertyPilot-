@@ -33,7 +33,7 @@ $actionBilling = '#ffc107';
 $actionViewRentList = '#17a2b8';
 $actionViewTenantList = '#6f42c1';
 $actionApartmentList = '#6c757d';
-$actionScheduleCreate = '#e83e8c';
+$actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
 
 // ✅ DB connection
@@ -50,15 +50,38 @@ if ($conn->connect_error) {
 $search_month = $_GET['month'] ?? date('m');
 $search_year = $_GET['year'] ?? date('Y');
 
-// ✅ Fetch rent records based on search
+// ✅ Query to join rent/bill info with transaction data
 $rent_list = [];
-$query = "SELECT rb.*, a.name as tenant_name 
-          FROM rentAndBill rb
-          JOIN addtenants a ON rb.tenant_id = a.tenant_id
-          WHERE rb.landlord_id = ? 
-          AND MONTH(rb.billing_date) = ? 
-          AND YEAR(rb.billing_date) = ?
-          ORDER BY rb.billing_date DESC";
+$query = "
+    SELECT
+        rb.*,
+        a.name AS tenant_name,
+        t_summary.total_paid,
+        t_summary.last_transaction_date,
+        t_summary.latest_status,
+        t_summary.latest_due_amount
+    FROM
+        rentandbill rb
+    JOIN
+        addtenants a ON rb.tenant_id = a.tenant_id
+    LEFT JOIN (
+        SELECT
+            rent_id,
+            SUM(amount) AS total_paid,
+            MAX(transaction_date) AS last_transaction_date,
+            (SELECT status FROM transactions WHERE rent_id = t_inner.rent_id ORDER BY transaction_date DESC LIMIT 1) AS latest_status,
+            (SELECT due_amount FROM transactions WHERE rent_id = t_inner.rent_id ORDER BY transaction_date DESC LIMIT 1) AS latest_due_amount
+        FROM
+            transactions t_inner
+        GROUP BY
+            rent_id
+    ) AS t_summary
+    ON
+        rb.rent_id = t_summary.rent_id
+    WHERE
+        rb.landlord_id = ? AND MONTH(rb.billing_date) = ? AND YEAR(rb.billing_date) = ?
+    ORDER BY
+        rb.billing_date DESC";
 
 $stmt = $conn->prepare($query);
 $stmt->bind_param("iii", $landlord_id, $search_month, $search_year);
@@ -77,11 +100,11 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rent and Bill List</title>
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #006A4E; 
-            --secondary-color: #4A90E2; 
+            --primary-color: #021934; 
+            --secondary-color: #2c5dbd; 
             --background-color: #f0f4ff;
             --card-background: #ffffff;
             --text-color: #333;
@@ -115,7 +138,7 @@ $conn->close();
         .vertical-sidebar .nav-links a {
           color: #f0f4ff; text-decoration: none; width: 100%; text-align: left; padding: 12px 15px;
           margin: 8px 0; font-weight: 600; font-size: 16px; border-radius: 8px;
-          transition: background-color 0.3s ease; display: flex; align-items: center; gap: 10px;
+          transition: background-color 0.3s ease; display: flex; align-items: center;;
         }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: #2c5dbd; }
         .vertical-sidebar .action-buttons {
@@ -140,7 +163,7 @@ $conn->close();
         main { flex-grow: 1; padding: 30px; height: 100%; overflow-y: auto; }
         .list-container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background-color: var(--card-background);
             border-radius: 20px;
@@ -148,7 +171,7 @@ $conn->close();
             overflow: hidden;
         }
         .list-header {
-            background-color: var(--primary-color);
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
             color: white;
             padding: 20px 30px;
         }
@@ -174,36 +197,25 @@ $conn->close();
             cursor: pointer;
             border: none;
         }
-        .table-wrapper {
-            padding: 30px;
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-        th {
-            background-color: #f2f2f2;
+        .table-wrapper { padding: 30px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background-color: #f2f2f2; font-weight: 600; color: var(--primary-color); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f5f5f5; }
+        .no-records { text-align: center; padding: 50px; font-size: 1.2rem; color: #777; }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
             font-weight: 600;
-            color: var(--primary-color);
-        }
-        tr:last-child td {
-            border-bottom: none;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        .no-records {
+            color: white;
             text-align: center;
-            padding: 50px;
-            font-size: 1.2rem;
-            color: #777;
         }
+        .status-paid { background-color: #28a745; }
+        .status-partially-paid { background-color: #ffc107; color: #333; }
+        .status-unpaid { background-color: #dc3545; }
     </style>
 </head>
 <body>
@@ -250,7 +262,7 @@ $conn->close();
                             <?php endfor; ?>
                         </select>
                         <input type="number" name="year" id="year" value="<?php echo $search_year; ?>" placeholder="Year" min="2000" max="2100">
-                        <button type="submit"><i class="fas fa-search"></i> Search</button>
+                        <button type="submit"><i class="fa fa-search"></i> Search</button>
                     </form>
                 </div>
                 <div class="table-wrapper">
@@ -259,31 +271,67 @@ $conn->close();
                             <tr>
                                 <th>Tenant Name</th>
                                 <th>Apt No</th>
-                                <th>Rent (৳)</th>
-                                <th>Other Bills (৳)</th>
-                                <th>Previous Due (৳)</th>
-                                <th>Total (৳)</th>
+                                <th>Total Amount (৳)</th>
+                                <th>Paid Amount (৳)</th>
+                                <th>Due Amount (৳)</th>
                                 <th>Billing Date</th>
+                                <th>Last Payment</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($rent_list)): ?>
                                 <tr>
-                                    <td colspan="7" class="no-records">No records found for the selected period.</td>
+                                    <td colspan="8" class="no-records">No records found for the selected period.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($rent_list as $record): 
-                                    $other_bills = $record['water_bill'] + $record['utility_bill'] + $record['guard_bill'];
-                                    $total_bill = $record['rent_amount'] + $other_bills + $record['previous_due'];
+                                    // GET PAID AND DUE AMOUNTS
+                                    $paid_amount = $record['total_paid'] ?? 0;
+                                    $initial_bill_total = $record['rent_amount'] + $record['water_bill'] + $record['utility_bill'] + $record['guard_bill'] + $record['previous_due'];
+                                    $due_amount = $record['latest_due_amount'] ?? $initial_bill_total;
+                                    
+                                    // =================================================================
+                                    // ✅ **WORKAROUND LOGIC**
+                                    // This reconstructs the original total bill by adding the amount paid to the current due amount.
+                                    // This is a temporary fix. The REAL fix is in your payment processing script.
+                                    if ($paid_amount > 0) {
+                                        $total_bill = $paid_amount + $due_amount;
+                                    } else {
+                                        $total_bill = $initial_bill_total;
+                                    }
+                                    // =================================================================
+
+                                    // DETERMINE STATUS
+                                    $status = $record['latest_status'] ?? 'Unpaid';
+                                    $status_class = 'status-unpaid';
+                                    if ($status === 'Paid') {
+                                        $status_class = 'status-paid';
+                                    } elseif ($status === 'Partially Paid') {
+                                        $status_class = 'status-partially-paid';
+                                    }
                                 ?>
                                     <tr>
                                         <td><?php echo htmlspecialchars($record['tenant_name']); ?></td>
                                         <td><?php echo htmlspecialchars($record['apartment_no']); ?></td>
-                                        <td><?php echo number_format($record['rent_amount'], 2); ?></td>
-                                        <td><?php echo number_format($other_bills, 2); ?></td>
-                                        <td><?php echo number_format($record['previous_due'], 2); ?></td>
                                         <td><strong><?php echo number_format($total_bill, 2); ?></strong></td>
+                                        <td><?php echo number_format($paid_amount, 2); ?></td>
+                                        <td><strong><?php echo number_format($due_amount, 2); ?></strong></td>
                                         <td><?php echo date("d M, Y", strtotime($record['billing_date'])); ?></td>
+                                        <td>
+                                            <?php 
+                                            if (!empty($record['last_transaction_date'])) {
+                                                echo date("d M, Y", strtotime($record['last_transaction_date']));
+                                            } else {
+                                                echo 'N/A';
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge <?php echo $status_class; ?>">
+                                                <?php echo htmlspecialchars($status); ?>
+                                            </span>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
