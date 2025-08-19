@@ -292,9 +292,10 @@ $conn->close();
     <div class="dashboard-content-wrapper">
         <nav class="vertical-sidebar">
             <div class="nav-links">
-                <a href="landlord_dashboard.php">Dashboard</a>
-                <a href="profile.php">Profile</a>
-                <a href="notifications.php">Notifications</a>
+                <a href="landlord_dashboard.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
+                <a href="propertyInfo.php"><i class="fas fa-building"></i> Add Property</a>
+                 <a href="maintanance.php"><i class="fas fa-tools"></i> Maintanance</a>
             </div>
             <section class="action-buttons">
                 <h3>Quick Actions</h3>

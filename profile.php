@@ -175,12 +175,12 @@ $profilePhoto = (!empty($user['profilePhoto']) && file_exists($user['profilePhot
             z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: hidden;
         }
         .vertical-sidebar .nav-links a {
-            color: <?php echo $textColor; ?>; text-decoration: none; width:100%; text-align: left; padding: 9px 12px;
+            color: <?php echo $textColor; ?>; text-decoration: none; width:100%; text-align: left; padding: 8px 11px;
             margin: 6px 0; font-weight: 600; font-size: 16px; border-radius: 8px;
             transition: background-color 0.3s ease; display: flex; align-items: center; ;
         }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: <?php echo $primaryAccent; ?>; }
-        .vertical-sidebar .action-buttons { width: 100%; display: flex; flex-direction: column; gap: 7px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1);   }
+        .vertical-sidebar .action-buttons { width: 100%; display: flex; flex-direction: column; gap: 6px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1);   }
         .vertical-sidebar .action-buttons h3 { color: <?php echo $textColor; ?>; font-size: 1.1em; margin-bottom: 5px; text-transform: uppercase; }
         .vertical-sidebar .action-link {
             width: calc(100% - 30px); padding: 9px 15px; border-radius: 8px; color: <?php echo $textColor; ?>;

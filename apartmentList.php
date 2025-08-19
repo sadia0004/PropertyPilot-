@@ -125,11 +125,12 @@ $brandColors = [
 </header>
 <div class="dashboard-content-wrapper">
     <nav class="vertical-sidebar">
-        <div class="nav-links">
-            <a href="landlord_dashboard.php">Dashboard</a>
-            <a href="profile.php">Profile</a>
-            <a href="propertyInfo.php">Add Property Info</a>
-        </div>
+         <div class="nav-links">
+                <a href="landlord_dashboard.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
+                <a href="propertyInfo.php"><i class="fas fa-building"></i> Add Property</a>
+                 <a href="maintanance.php"><i class="fas fa-tools"></i> Maintanance</a>
+            </div>
         <div class="action-buttons">
             <h3>Quick Actions</h3>
             <a href="add_tenant.php" class="action-link link-add-tenant">+ Add Tenant</a>

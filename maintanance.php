@@ -4,15 +4,9 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // ✅ Standardized session check
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'landlord') {
     header("Location: login.php");
     exit();
-}
-
-// Check the role of the user
-$userRole = $_SESSION['userRole'] ?? 'tenant';
-if ($userRole !== 'landlord') {
-    die("Access Denied: This page is for landlords only.");
 }
 $landlord_id = $_SESSION['user_id'];
 
@@ -20,14 +14,12 @@ $landlord_id = $_SESSION['user_id'];
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// Define the consistent brand color palette
+// --- Define Color Palette ---
 $primaryDark = '#021934';
 $primaryAccent = '#2c5dbd';
 $textColor = '#f0f4ff';
 $secondaryBackground = '#f0f4ff';
 $cardBackground = '#ffffff';
-
-// Action button colors
 $actionAdd = '#28a745';
 $actionBilling = '#ffc107';
 $actionViewRentList = '#17a2b8';
@@ -140,14 +132,14 @@ $conn->close();
           z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: hidden;
         }
         .vertical-sidebar .nav-links a {
-          color: #f0f4ff; text-decoration: none; width: 100%; text-align: left; padding: 12px 15px;
+          color: #f0f4ff; text-decoration: none; width: 100%; text-align: left; padding: 9px 12px;
           margin: 8px 0; font-weight: 600; font-size: 16px; border-radius: 8px;
-          transition: background-color 0.3s ease; display: flex; align-items: center;;
+          transition: background-color 0.3s ease; display: flex; align-items: center; gap: 7px;
         }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: #2c5dbd; }
         .vertical-sidebar .action-buttons {
-          margin-top: 5px; width: 100%; display: flex; flex-direction: column;
-          gap: 8px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 10px;
+          margin-top: 12px; width: 100%; display: flex; flex-direction: column;
+          gap: 7px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 5px;
         }
         .vertical-sidebar .action-buttons h3 { color: #f0f4ff; font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
         .vertical-sidebar .action-link {
@@ -164,7 +156,6 @@ $conn->close();
         .vertical-sidebar .link-schedule-create { background-color: <?php echo $actionScheduleCreate; ?>; }
         .vertical-sidebar .link-schedule-details { background-color: <?php echo $actionScheduleDetails; ?>; }
         .vertical-sidebar .link-maintenance { background-color: <?php echo $actionMaintenance; ?>; }
-
 
         main { flex-grow: 1; padding: 30px; height: 100%; overflow-y: auto; }
         .page-header { margin-bottom: 30px; }
@@ -239,9 +230,10 @@ $conn->close();
     <div class="dashboard-content-wrapper">
         <nav class="vertical-sidebar">
             <div class="nav-links">
-                <a href="landlord_dashboard.php">Dashboard</a>
-                <a href="profile.php">Profile</a>
-                <a href="notifications.php">Notifications</a>
+                <a href="landlord_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
+                <a href="propertyInfo.php"><i class="fas fa-building"></i> Add Property</a>
+                <a href="maintanance.php" class="active"><i class="fas fa-tools"></i> Maintanance</a>
             </div>
             <section class="action-buttons">
                 <h3>Quick Actions</h3>
@@ -250,8 +242,8 @@ $conn->close();
                 <a href="apartmentList.php" class="action-link link-docs"><i class="fas fa-building"></i> Apartment List</a>
                 <a href="RentAndBillForm.php" class="action-link link-billing"><i class="fas fa-file-invoice-dollar"></i> Rent and Bills</a>
                 <a href="Rent_list.php" class="action-link link-rent"><i class="fas fa-list-ul"></i> View Rent List</a>
-                <!-- This page link -->
-                <a href="maintenance_requests.php" class="action-link link-maintenance active"><i class="fas fa-tools"></i> Maintenance</a>
+                <a href="Schedule_create.php" class="action-link link-schedule-create"><i class="fas fa-calendar-plus"></i> Create Schedule</a>
+                <a href="scheduleInfo.php" class="action-link link-schedule-details"><i class="fas fa-calendar-alt"></i> Schedule Details</a>
             </section>
         </nav>
 

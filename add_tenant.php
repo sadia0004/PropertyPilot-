@@ -207,20 +207,20 @@ $conn->close();
           z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: hidden;
         }
         .vertical-sidebar .nav-links a {
-          color: var(--text-color); text-decoration: none; width: 100%; text-align: left; padding: 8px 11px;
-          margin: 6px 0; font-weight: 600; font-size: 16px; border-radius: 8px;
+          color: var(--text-color); text-decoration: none; width: 100%; text-align: left; padding: 7px 11px;
+          margin: 2px 0; font-weight: 600; font-size: 16px; border-radius: 8px;
           transition: background-color 0.3s ease; display: flex; align-items: center; ;
         }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: #2c5dbd; }
         .vertical-sidebar .action-buttons {
           margin-top: 5px; width: 100%; display: flex; flex-direction: column;
-          gap: 8px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 8px;
+          gap: 8px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); ;
         }
         .vertical-sidebar .action-buttons h3 { color: var(--text-color); font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
         .vertical-sidebar .action-link {
-          width: calc(100% - 30px); padding: 9px 15px; border-radius: 8px; color: var(--text-color);
+          width: calc(100% - 30px); padding: 9px 12px; border-radius: 8px; color: var(--text-color);
           font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center;
-          justify-content: flex-start; gap: 10px; text-decoration: none; transition: all 0.2s ease;
+          justify-content: flex-start; gap: 6px; text-decoration: none; transition: all 0.2s ease;
         }
         .vertical-sidebar .action-link:hover { transform: translateX(5px); background-color: rgba(255, 255, 255, 0.1); }
         .vertical-sidebar .link-tenant { background-color: <?php echo $actionAdd; ?>; }
@@ -247,10 +247,11 @@ $conn->close();
 
     <div class="dashboard-content-wrapper">
         <nav class="vertical-sidebar">
-            <div class="nav-links">
-                <a href="landlord_dashboard.php">Dashboard</a>
-                <a href="profile.php">Profile</a>
-                <a href="notifications.php">Notifications</a>
+             <div class="nav-links">
+                <a href="landlord_dashboard.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
+                <a href="propertyInfo.php"><i class="fas fa-building"></i> Add Property</a>
+                 <a href="maintanance.php"><i class="fas fa-tools"></i> Maintanance</a>
             </div>
             <section class="action-buttons">
                 <h3>Quick Actions</h3>

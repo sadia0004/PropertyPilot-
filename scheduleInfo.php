@@ -178,11 +178,12 @@ if ($flash_message) {
 
     <div class="dashboard-content-wrapper">
         <nav class="vertical-sidebar">
+
             <div class="nav-links">
                 <a href="landlord_dashboard.php">Dashboard</a>
                 <a href="profile.html">Profile</a>
                 <a href="propertyInfo.php">Add Property Info</a>
-                <a href="notifications.html">Notifications</a>
+                 <a href="maintanance.php">Maintanance</a>
             </div>
             <section class="action-buttons">
                 <h3>Quick Actions</h3>
