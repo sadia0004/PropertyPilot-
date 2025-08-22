@@ -110,9 +110,9 @@ $brandColors = [
         .vertical-sidebar .action-buttons { border-top: 1px solid rgba(255,255,255,0.1);   }
         .vertical-sidebar .action-buttons h3 { color: <?php echo $brandColors['textColor']; ?>; font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
         .vertical-sidebar .action-link {
-            width: 100%; padding: 9px 15px; border-radius: 8px; color: <?php echo $brandColors['textColor']; ?>;
+            width: 90%; padding: 9px 15px; border-radius: 8px; color: <?php echo $brandColors['textColor']; ?>;
             font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center;
-            gap: 8px; text-decoration: none; margin: 4px 0;
+            gap: 8px; text-decoration: none; margin: 6px 0; ;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
         .vertical-sidebar .action-link:hover {

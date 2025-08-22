@@ -28,6 +28,7 @@ $actionApartmentList = '#6c757d';
 $actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
 $actionMaintenance = '#dc3545';
+$actionPostVacancy = '#3d5977ff'; // Color for the new button
 
 // --- DB Connection ---
 $conn = new mysqli("localhost", "root", "", "property");
@@ -43,7 +44,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'dismiss_alerts') {
     exit();
 }
 
-
 // =================================================================
 // ✅ FETCHING ALL DASHBOARD DATA FROM DATABASE
 // =================================================================
@@ -54,19 +54,15 @@ $totalTenants = 0;
 $monthlyIncome = 0;
 $pendingMaintenance = 0;
 
-// Total Flats
 $result = $conn->query("SELECT COUNT(*) as count FROM properties WHERE landlord_id = $landlord_id");
 $totalFlats = $result->fetch_assoc()['count'];
 
-// Total Tenants
 $result = $conn->query("SELECT COUNT(*) as count FROM addtenants WHERE landlord_id = $landlord_id");
 $totalTenants = $result->fetch_assoc()['count'];
 
-// Potential Monthly Income
 $result = $conn->query("SELECT SUM(monthly_rent) as total FROM addtenants WHERE landlord_id = $landlord_id");
 $monthlyIncome = $result->fetch_assoc()['total'] ?? 0;
 
-// Pending Maintenance Requests
 $result = $conn->query("SELECT COUNT(*) as count FROM maintenance_requests WHERE landlord_id = $landlord_id AND status = 'Pending'");
 $pendingMaintenance = $result->fetch_assoc()['count'];
 
@@ -75,14 +71,14 @@ $occupiedFlats = 0;
 $occupancyRate = 0;
 $totalDue = 0;
 
-// Occupancy Rate
 $result = $conn->query("SELECT COUNT(*) as count FROM properties WHERE landlord_id = $landlord_id AND apartment_status = 'Occupied'");
 $occupiedFlats = $result->fetch_assoc()['count'];
 if ($totalFlats > 0) {
     $occupancyRate = round(($occupiedFlats / $totalFlats) * 100);
 }
+$vacantFlats = $totalFlats - $occupiedFlats;
 
-// Total Due Amount for the current month
+
 $currentMonth = date('m');
 $currentYear = date('Y');
 $query = "SELECT SUM(rb.rent_amount + rb.water_bill + rb.utility_bill + rb.guard_bill + rb.previous_due - IFNULL(t.total_paid, 0)) as total_due
@@ -95,7 +91,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $totalDue = $result->fetch_assoc()['total_due'] ?? 0;
 $stmt->close();
-
 
 // --- 3. Late Payment Notifications ---
 $lateTenants = [];
@@ -158,15 +153,15 @@ $conn->close();
         .vertical-sidebar .nav-links a {
             color: <?php echo $textColor; ?>; text-decoration: none; width:100%; text-align: left; padding: 9px 12px;
             margin: 6px 0; font-weight: 600; font-size: 16px; border-radius: 8px;
-            transition: background-color 0.3s ease; display: flex; align-items: center; ;
+            transition: background-color 0.3s ease; display: flex; align-items: center; gap: 5px;
         }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: <?php echo $primaryAccent; ?>; }
-        .vertical-sidebar .action-buttons { width: 100%; display: flex; flex-direction: column; gap: 7px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-        .vertical-sidebar .action-buttons h3 { color: <?php echo $textColor; ?>; font-size: 1.1em; margin-bottom: 8px; text-transform: uppercase; }
+        .vertical-sidebar .action-buttons { width: 100%; display: flex; flex-direction: column; gap: 7px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 5px; }
+        .vertical-sidebar .action-buttons h3 { color: <?php echo $textColor; ?>; font-size: 1.1em; margin-bottom: 4px; text-transform: uppercase; }
         .vertical-sidebar .action-link {
-            width: calc(100% - 30px); padding: 9px 12px; border-radius: 8px; color: <?php echo $textColor; ?>;
+            width: calc(100% - 20px); padding: 9px 12px; border-radius: 8px; color: <?php echo $textColor; ?>;
             font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center;
-            justify-content: flex-start; gap: 10px; text-decoration: none; transition: background-color 0.3s ease, transform 0.2s ease;
+            justify-content: flex-start; gap: 7px; text-decoration: none; transition: background-color 0.3s ease, transform 0.2s ease;
         }
         .vertical-sidebar .action-link:hover { transform: translateX(5px); background-color: rgba(255, 255, 255, 0.1); }
         .vertical-sidebar .link-tenant { background-color: <?php echo $actionAdd; ?>; }
@@ -179,8 +174,30 @@ $conn->close();
 
         main { flex-grow: 1; padding: 40px; height: 100%; overflow-y: auto; }
         .welcome-header { margin-bottom: 40px; }
-        .welcome-header h1 { font-size: 2.5rem; font-weight: 700; color: #2c3e50; margin: 0 0 5px 0; }
-        .welcome-header p { font-size: 1.1rem; color: #7f8c8d; margin: 0; }
+        .welcome-header h1 { font-size: 2.5rem; font-weight: 700; color: #2c3e50; margin: 0; }
+        .welcome-header p { font-size: 1.1rem; color: #7f8c8d; margin-top: 5px; }
+        
+        .vacancy-card {
+            background: linear-gradient(45deg, <?php echo $primaryAccent; ?>, <?php echo $actionPostVacancy; ?>);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 25px rgba(0, 123, 255, 0.2);
+        }
+        .vacancy-card-content h2 { margin: 0 0 10px 0; font-size: 1.8rem; }
+        .vacancy-card-content p { margin: 0; opacity: 0.9; }
+        .btn-main-action {
+            background-color: white; color: <?php echo $primaryAccent; ?>; padding: 12px 25px;
+            border-radius: 8px; text-decoration: none; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-main-action:hover { transform: scale(1.05); }
+
         .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; }
         .card {
             background: <?php echo $cardBackground; ?>; padding: 25px; border-radius: 15px;
@@ -200,7 +217,6 @@ $conn->close();
         .card .number { font-size: 2.8rem; font-weight: 700; color: #2c3e50; margin-bottom: 5px; }
         .card .label { font-size: 1rem; font-weight: 500; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Analytics Section */
         .analytics-section { margin-top: 50px; }
         .analytics-header { font-size: 1.8rem; font-weight: 600; color: #2c3e50; margin-bottom: 20px; }
         .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
@@ -209,7 +225,6 @@ $conn->close();
         .card.analytics-card { border-color: #1abc9c; }
         .card.analytics-card .icon { color: #1abc9c; }
 
-        /* Late Payment Alert Section */
         .alert-section {
             background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
             border-left: 5px solid #c0392b; border-radius: 8px;
@@ -248,27 +263,38 @@ $conn->close();
                 <a href="landlord_dashboard.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                 <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
                 <a href="propertyInfo.php"><i class="fas fa-building"></i> Add Property</a>
-                 <a href="maintanance.php"><i class="fas fa-tools"></i> Maintanance</a>
+                <a href="maintanance.php"><i class="fas fa-tools"></i> Maintanance</a>
             </div>
             <section class="action-buttons">
                 <h3>Quick Actions</h3>
-                <a href="add_tenant.php" class="action-link link-tenant">+ Add Tenant</a>
-                <a href="tenant_List.php" class="action-link link-tenant-list">View Tenant List</a>
-                <a href="apartmentList.php" class="action-link link-docs">Apartment List</a>
-                <a href="RentAndBillForm.php" class="action-link link-billing">Rent and Bills</a>
-                <a href="Rent_list.php" class="action-link link-rent">View Rent List</a>
-                <a href="Schedule_create.php" class="action-link link-schedule-create">Create Schedule</a>
-                <a href="scheduleInfo.php" class="action-link link-schedule-details">🗓️ Schedule Details</a>
+                <a href="add_tenant.php" class="action-link link-tenant"><i class="fas fa-user-plus"></i> Add Tenant</a>
+                <a href="tenant_List.php" class="action-link link-tenant-list"><i class="fas fa-users"></i> View Tenant List</a>
+                <a href="apartmentList.php" class="action-link link-docs"><i class="fas fa-list"></i> Apartment List</a>
+                <a href="RentAndBillForm.php" class="action-link link-billing"><i class="fas fa-file-invoice-dollar"></i> Rent and Bills</a>
+                <a href="Rent_list.php" class="action-link link-rent"><i class="fas fa-list-ul"></i> View Rent List</a>
+                <a href="Schedule_create.php" class="action-link link-schedule-create"><i class="fas fa-calendar-plus"></i> Create Schedule</a>
+                <a href="scheduleInfo.php" class="action-link link-schedule-details"><i class="fas fa-calendar-alt"></i> Schedule Details</a>
             </section>
         </nav>
 
         <main>
             <header class="welcome-header">
-                <h1>Welcome back, <?php echo htmlspecialchars(explode(' ', $fullName)[0]); ?>!</h1>
-                <p>Here's a summary of your property portfolio.</p>
+                <div>
+                    <h1>Welcome back, <?php echo htmlspecialchars(explode(' ', $fullName)[0]); ?>!</h1>
+                    <p>Here's a summary of your property portfolio.</p>
+                </div>
             </header>
 
-            <!-- ✅ LATE PAYMENT ALERT SECTION -->
+            <section class="vacancy-card">
+                <div class="vacancy-card-content">
+                    <h2>Manage Your Vacancies</h2>
+                    <p>You have <strong><?php echo $vacantFlats; ?></strong> vacant properties. Post a listing to find your next tenant.</p>
+                </div>
+                <div>
+                    <a href="post_vacancy.php" class="btn-main-action"><i class="fas fa-bullhorn"></i> Post a New Vacancy</a>
+                </div>
+            </section>
+
             <?php if (!empty($lateTenants) && !isset($_SESSION[$dismiss_key])): ?>
             <section class="alert-section">
                 <div class="alert-header">
@@ -288,26 +314,10 @@ $conn->close();
             <?php endif; ?>
             
             <section class="cards-container">
-                <div class="card flats">
-                    <div class="icon"><i class="fas fa-building"></i></div>
-                    <div class="number"><?php echo $totalFlats; ?></div>
-                    <div class="label">Total Flats</div>
-                </div>
-                <div class="card tenants">
-                    <div class="icon"><i class="fas fa-users"></i></div>
-                    <div class="number"><?php echo $totalTenants; ?></div>
-                    <div class="label">Total Tenants</div>
-                </div>
-                <div class="card income">
-                    <div class="icon"><i class="fas fa-dollar-sign"></i></div>
-                    <div class="number">৳<?php echo number_format($monthlyIncome); ?></div>
-                    <div class="label">Monthly Income</div>
-                </div>
-                <div class="card maintenance">
-                    <div class="icon"><i class="fas fa-tools"></i></div>
-                    <div class="number"><?php echo $pendingMaintenance; ?></div>
-                    <div class="label">Pending Maintenance</div>
-                </div>
+                <div class="card flats"><div class="icon"><i class="fas fa-building"></i></div><div class="number"><?php echo $totalFlats; ?></div><div class="label">Total Flats</div></div>
+                <div class="card tenants"><div class="icon"><i class="fas fa-users"></i></div><div class="number"><?php echo $totalTenants; ?></div><div class="label">Total Tenants</div></div>
+                <div class="card income"><div class="icon"><i class="fas fa-dollar-sign"></i></div><div class="number">৳<?php echo number_format($monthlyIncome); ?></div><div class="label">Monthly Income</div></div>
+                <div class="card maintenance"><div class="icon"><i class="fas fa-tools"></i></div><div class="number"><?php echo $pendingMaintenance; ?></div><div class="label">Pending Maintenance</div></div>
             </section>
 
             <section class="analytics-section">
@@ -323,7 +333,7 @@ $conn->close();
                         </div>
                         <div class="label">Occupancy Rate</div>
                     </div>
-                     <div class="card analytics-card">
+                   <div class="card analytics-card">
                         <div class="icon"><i class="fas fa-hand-holding-usd"></i></div>
                         <div class="number">৳<?php echo number_format($totalDue); ?></div>
                         <div class="label">Total Amount Due</div>
