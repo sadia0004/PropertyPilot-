@@ -9,8 +9,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'admin') {
     exit();
 }
 $admin_id = $_SESSION['user_id'];
-
-
 $fullName_header = $_SESSION['fullName'] ?? 'Admin';
 $profilePhoto_header = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
@@ -22,7 +20,7 @@ $secondaryBackground = '#F0F2F5';
 $cardBackground = '#FFFFFF';
 $actionMaintenance = '#dc3545';
 
-// --- DB Connection ---
+//DB Connection
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -31,22 +29,22 @@ if ($conn->connect_error) {
 $successMsg = "";
 $errorMsg = "";
 
-// --- Form Handling ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $fullName     = trim($_POST['fullName']);
-    $email        = trim($_POST['email']);
-    $phoneNumber  = trim($_POST['phoneNumber']);
-    $nationalId   = trim($_POST['nationalId']);
-    $userRole     = trim($_POST['userRole']);
-    $rawPassword  = $_POST['password'];
+    $fullName      = trim($_POST['fullName']);
+    $email         = trim($_POST['email']);
+    $phoneNumber   = trim($_POST['phoneNumber']);
+    $nationalId    = trim($_POST['nationalId']);
+    $userRole      = trim($_POST['userRole']);
+    $rawPassword   = $_POST['password'];
     $confirmPassword = $_POST['confirmPassword'];
     $profilePhoto = "";
 
-    // --- Validation ---
+    // Validation
     if ($rawPassword !== $confirmPassword) {
         $errorMsg = "Passwords do not match.";
     } else {
-       
+        
         $checkStmt = $conn->prepare("SELECT email, nationalId FROM users WHERE email = ? OR nationalId = ?");
         $checkStmt->bind_param("ss", $email, $nationalId);
         $checkStmt->execute();
@@ -78,18 +76,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $conn->begin_transaction();
         try {
-           
+            
             $insertStmt = $conn->prepare("INSERT INTO users (fullName, email, phoneNumber, password, profilePhoto, nationalId, userRole) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $insertStmt->bind_param("sssssss", $fullName, $email, $phoneNumber, $hashedPassword, $profilePhoto, $nationalId, $userRole);
             $insertStmt->execute();
             $newUserId = $insertStmt->insert_id;
             $insertStmt->close();
 
-          
+         
             if ($userRole === 'tenant') {
+                
+                if (!isset($_POST['landlord_id']) || empty($_POST['landlord_id']) || !isset($_POST['apartment_no']) || empty($_POST['apartment_no'])) {
+                    
+                    throw new Exception("For tenants, a landlord and an apartment must be assigned.");
+                }
+
                 $landlord_id = $_POST['landlord_id'];
                 $apartment_no = $_POST['apartment_no'];
-                $monthly_rent = $_POST['monthly_rent'];
+                $monthly_rent = $_POST['monthly_rent'] ?? 0; 
 
                 $addTenantStmt = $conn->prepare("INSERT INTO addtenants (tenant_id, landlord_id, name, apartment_no, monthly_rent) VALUES (?, ?, ?, ?, ?)");
                 $addTenantStmt->bind_param("iissd", $newUserId, $landlord_id, $fullName, $apartment_no, $monthly_rent);
@@ -101,13 +105,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $updatePropStmt->execute();
                 $updatePropStmt->close();
             }
+      
             
             $conn->commit();
             $successMsg = "User account created successfully!";
 
-        } catch (mysqli_sql_exception $exception) {
+        } catch (Exception $exception) { 
             $conn->rollback();
-            $errorMsg = "Database error: could not create user. " . $exception->getMessage();
+            $errorMsg = "Error: " . $exception->getMessage();
         }
     }
 }
@@ -134,6 +139,7 @@ while($landlord = $landlordResult->fetch_assoc()) {
         ];
     }
 }
+
 
 $conn->close();
 ?>
@@ -245,7 +251,7 @@ $conn->close();
                         <div class="form-group"><label for="profilePhoto">Profile Photo</label><input type="file" id="profilePhoto" name="profilePhoto" accept="image/*"></div>
                     </div>
                     
-                 
+                
                     <div id="tenant-fields" class="form-row">
                         <div class="form-group">
                             <label for="landlord_id">Assign to Landlord</label>
