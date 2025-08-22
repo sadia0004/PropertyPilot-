@@ -1,0 +1,7 @@
+{
+    "site_name": "PropertyPilot",
+    "contact_email": "support@propertypilot.com",
+    "currency_symbol": "\u09f3",
+    "rent_due_day": 12,
+    "maintenance_mode": "off"
+}
