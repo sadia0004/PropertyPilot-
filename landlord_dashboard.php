@@ -251,7 +251,7 @@ $conn->close();
             PropertyPilot
         </div>
         <div class="top-right-user-info">
-            <span class="welcome-greeting">👋 Welcome, <?php echo htmlspecialchars($fullName); ?></span>
+            <span class="welcome-greeting"><?php echo htmlspecialchars($fullName); ?></span>
             <img class="user-photo" src="<?php echo htmlspecialchars($profilePhoto); ?>" alt="Profile Photo">
             <a href="logout.php" class="logout-btn">Logout</a>
         </div>
