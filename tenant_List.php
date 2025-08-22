@@ -161,24 +161,24 @@ $conn->close();
         .dashboard-content-wrapper { display: flex; flex-grow: 1; margin-top: 80px; height: calc(100vh - 80px); overflow: hidden; }
         .vertical-sidebar {
           display: flex; flex-direction: column; align-items: flex-start; background-color: var(--primary-dark);
-          padding: 20px 15px; color: var(--text-color); box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+          padding: 10px 12px; color: var(--text-color); box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
           z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: hidden;
         }
         .vertical-sidebar .nav-links a {
           color: var(--text-color); text-decoration: none; width: 100%; text-align: left; padding: 9px 12px;
-          margin: 8px 0; font-weight: 600; font-size: 16px; border-radius: 8px;
+          margin: 5px 0; font-weight: 600; font-size: 16px; border-radius: 8px;
           transition: background-color 0.3s ease; display: flex; align-items: center;;
         }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: #2c5dbd; }
         .vertical-sidebar .action-buttons {
-          margin-top: 5px; width: 100%; display: flex; flex-direction: column;
-          gap: 7px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 7px;
+          width: 100%; display: flex; flex-direction: column;
+          gap: 7px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1);;
         }
         .vertical-sidebar .action-buttons h3 { color: var(--text-color); font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
         .vertical-sidebar .action-link {
-          width: calc(100% - 30px); padding: 9px 12px; border-radius: 8px; color: var(--text-color);
+          width: calc(100% - 30px); padding: 9px 11px; border-radius: 8px; color: var(--text-color);
           font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center;
-          justify-content: flex-start; gap: 10px; text-decoration: none; transition: all 0.2s ease;
+          justify-content: flex-start; gap: 5px; text-decoration: none; transition: all 0.2s ease;
         }
         .vertical-sidebar .action-link:hover { transform: translateX(5px); background-color: rgba(255, 255, 255, 0.1); }
         .vertical-sidebar .link-tenant { background-color: <?php echo $actionAdd; ?>; }

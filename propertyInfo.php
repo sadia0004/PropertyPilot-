@@ -127,12 +127,12 @@ $conn->close();
         .dashboard-content-wrapper { display: flex; flex-grow: 1; margin-top: 80px; height: calc(100vh - 80px); overflow: hidden; }
         
         /* Vertical Sidebar */
-        .vertical-sidebar { display: flex; flex-direction: column; align-items: flex-start; background-color: <?php echo $primaryDark; ?>; padding: 20px 15px; color: <?php echo $textColor; ?>; box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2); z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: hidden; /* <-- SCROLLBAR REMOVED */ }
+        .vertical-sidebar { display: flex; flex-direction: column; align-items: flex-start; background-color: <?php echo $primaryDark; ?>; padding: 20px 15px; color: <?php echo $textColor; ?>; box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2); z-index: 1000; flex-shrink: 0; width: 250px; height: 100%; overflow-y: hidden; }
         .vertical-sidebar .nav-links a { color: <?php echo $textColor; ?>; text-decoration: none; width:100% ; text-align: left; padding: 8px 11px; margin: 4px 0; font-weight: 600; font-size: 16px; border-radius: 8px; transition: background-color 0.3s ease; display: flex; align-items: center; gap: 8px; }
         .vertical-sidebar .nav-links a:hover, .vertical-sidebar .nav-links a.active { background-color: <?php echo $primaryAccent; ?>; }
         
         /* Sidebar Action Buttons */
-        .vertical-sidebar .action-buttons { margin-top: 12px; width: 100%; display: flex; flex-direction: column; gap: 7px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1);  }
+        .vertical-sidebar .action-buttons { margin-top: 12px; width: 100%; display: flex; flex-direction: column; gap: 7px; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px; }
         .vertical-sidebar .action-buttons h3 { color: <?php echo $textColor; ?>; font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
         .vertical-sidebar .action-link { width: calc(100% - 30px); padding: 8px 12px; border-radius: 8px; color: <?php echo $textColor; ?>; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: flex-start; gap: 10px; text-decoration: none; transition: background-color 0.3s ease, transform 0.2s ease; }
         .vertical-sidebar .action-link:hover { transform: translateX(5px); background-color: rgba(255, 255, 255, 0.1); }
@@ -144,9 +144,10 @@ $conn->close();
         .vertical-sidebar .link-schedule-create { background-color: <?php echo $actionScheduleCreate; ?>; }
         .vertical-sidebar .link-schedule-details { background-color: <?php echo $actionScheduleDetails; ?>; }
 
-        /* Styles specific to this form page */
-        .page-main-content { flex-grow: 1; padding: 40px; display: flex; justify-content: center; align-items: flex-start; height: 100%; overflow-y: hidden; /* <-- SCROLLBAR REMOVED */ }
-        .form-container { max-width: 650px; background: #ffffff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); width: 100%; }
+        /* ✅ FIXED: ENABLED SCROLLING FOR MAIN CONTENT */
+        .page-main-content { flex-grow: 1; padding: 40px; height: 100%; overflow-y: auto; }
+        
+        .form-container { max-width: 650px; background: #ffffff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); width: 100%; margin: 0 auto; }
         .form-container h2 { text-align: center; color: #021934; margin-bottom: 30px; font-weight: 700; }
         .form-container form { display: flex; flex-wrap: wrap; gap: 25px; justify-content: space-between; }
         .form-field-group { flex-basis: calc(50% - 12.5px); display: flex; flex-direction: column; }
@@ -177,10 +178,10 @@ $conn->close();
     <div class="dashboard-content-wrapper">
         <nav class="vertical-sidebar">
             <div class="nav-links">
-                <a href="landlord_dashboard.php">Dashboard</a>
-                <a href="profile.php">Profile</a>
-                <a href="propertyInfo.php" class="active">Add Property Info</a>
-                <a href="maintanance.php">Maintanance</a>
+                <a href="landlord_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
+                <a href="propertyInfo.php" class="active"><i class="fas fa-building"></i> Add Property</a>
+                <a href="maintanance.php"><i class="fas fa-tools"></i> Maintanance</a>
             </div>
             <section class="action-buttons">
                 <h3>Quick Actions</h3>

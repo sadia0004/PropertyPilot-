@@ -43,13 +43,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['profilePhoto'] = $profilePhoto;
             $_SESSION['userRole'] = $userRole;
 
-            // Store role-specific ID
+            // Redirect based on user role
             if ($userRole === "landlord") {
                 $_SESSION['landlord_id'] = $id;
                 header("Location: landlord_dashboard.php");
             } elseif ($userRole === "tenant") {
                 $_SESSION['tenant_id'] = $id;
                 header("Location: tenant_dashboard.php");
+            } elseif ($userRole === "admin") { // ✅ ADDED ADMIN REDIRECT
+                $_SESSION['admin_id'] = $id;
+                header("Location: admin_dashboard.php");
             } else {
                 $errorMsg = "Invalid user role.";
             }
