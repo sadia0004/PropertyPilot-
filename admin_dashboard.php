@@ -3,18 +3,18 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Protect the page: allow only logged-in admins
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
 $admin_id = $_SESSION['user_id'];
 
-// Retrieve user data from session
+
 $fullName = $_SESSION['fullName'] ?? 'Admin';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette ---
+
 $primaryDark = '#0A0908'; 
 $primaryAccent = '#491D8B'; 
 $textColor = '#F2F4F3';
@@ -22,17 +22,12 @@ $secondaryBackground = '#F0F2F5';
 $cardBackground = '#FFFFFF';
 $actionMaintenance = '#dc3545';
 
-// --- DB Connection ---
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// =================================================================
-// ✅ FETCHING ALL ADMIN DASHBOARD DATA FROM DATABASE
-// =================================================================
 
-// --- 1. Main Card Data ---
 $totalUsers = 0; $totalLandlords = 0; $totalTenants = 0; $totalProperties = 0; $totalPlatformIncome = 0;
 $result = $conn->query("SELECT COUNT(*) as count FROM users"); $totalUsers = $result->fetch_assoc()['count'];
 $result = $conn->query("SELECT COUNT(*) as count FROM users WHERE userRole = 'landlord'"); $totalLandlords = $result->fetch_assoc()['count'];
@@ -40,33 +35,32 @@ $result = $conn->query("SELECT COUNT(*) as count FROM users WHERE userRole = 'te
 $result = $conn->query("SELECT COUNT(*) as count FROM properties"); $totalProperties = $result->fetch_assoc()['count'];
 $result = $conn->query("SELECT SUM(monthly_rent) as total FROM addtenants"); $totalPlatformIncome = $result->fetch_assoc()['total'] ?? 0;
 
-// --- 2. Platform Financial Summary ---
-$totalTransactionsCount = 0; // ✅ RENAMED VARIABLE
+
+$totalTransactionsCount = 0; 
 $totalAmountTransacted = 0;
 $averageRent = 0;
 
-// Total number of transactions
-$result = $conn->query("SELECT COUNT(*) as count FROM transactions");
-$totalTransactionsCount = $result->fetch_assoc()['count']; // ✅ CORRECTED VARIABLE NAME
 
-// Total amount transacted
+$result = $conn->query("SELECT COUNT(*) as count FROM transactions");
+$totalTransactionsCount = $result->fetch_assoc()['count']; 
+
+
 $result = $conn->query("SELECT SUM(amount) as total FROM transactions");
 $totalAmountTransacted = $result->fetch_assoc()['total'] ?? 0;
 
-// Average rent across all properties
+
 $result = $conn->query("SELECT AVG(apartment_rent) as avg_rent FROM properties");
 $averageRent = $result->fetch_assoc()['avg_rent'] ?? 0;
 
 
-// --- 3. Data for Charts ---
-// User Roles Distribution (Excluding Admins)
+
 $userRolesData = [];
 $result = $conn->query("SELECT userRole, COUNT(*) as count FROM users WHERE userRole != 'admin' GROUP BY userRole");
 while ($row = $result->fetch_assoc()) {
     $userRolesData[$row['userRole']] = $row['count'];
 }
 
-// Monthly Registrations (Last 6 months)
+
 $monthlyRegData = [];
 $months = [];
 for ($i = 5; $i >= 0; $i--) {
@@ -83,7 +77,7 @@ while ($row = $regResult->fetch_assoc()) {
         $months[$row['month']]['count'] = $row['count'];
     }
 }
-// Prepare data for Chart.js
+
 $regLabels = [];
 $regCounts = [];
 foreach ($months as $data) {
@@ -91,7 +85,7 @@ foreach ($months as $data) {
     $regCounts[] = $data['count'];
 }
 
-// --- 4. Recent Users List ---
+
 $recentUsers = [];
 $result = $conn->query("SELECT fullName, email, userRole, created_at FROM users ORDER BY created_at DESC LIMIT 5");
 while ($row = $result->fetch_assoc()) {
@@ -145,7 +139,7 @@ $conn->close();
         .welcome-header h1 { font-size: 2.5rem; font-weight: 700; color: #2c3e50; margin: 0 0 5px 0; }
         .welcome-header p { font-size: 1.1rem; color: #7f8c8d; margin: 0; }
         
-        .dashboard-section { margin-bottom: 40px; } /* ✅ ADDED for vertical spacing */
+        .dashboard-section { margin-bottom: 40px; } 
 
         .cards-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 25px; }
         .card {
@@ -269,7 +263,7 @@ $conn->close();
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- User Roles Chart (Doughnut) ---
+        
             const userRolesCtx = document.getElementById('userRolesChart').getContext('2d');
             new Chart(userRolesCtx, {
                 type: 'doughnut',

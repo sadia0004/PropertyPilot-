@@ -3,18 +3,17 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Protect the page: allow only logged-in users
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'landlord') {
     header("Location: login.php");
     exit();
 }
 $landlord_id = $_SESSION['user_id'];
 
-// Retrieve user data from session
+
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette ---
+
 $primaryDark = '#021934';
 $primaryAccent = '#2c5dbd';
 $textColor = '#f0f4ff';
@@ -28,15 +27,15 @@ $actionApartmentList = '#6c757d';
 $actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
 $actionMaintenance = '#dc3545';
-$actionPostVacancy = '#3d5977ff'; // Color for the new button
+$actionPostVacancy = '#3d5977ff';
 
-// --- DB Connection ---
+
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// --- Handle Dismissal of Late Payment Notification ---
+
 $dismiss_key = 'late_rent_dismissed_' . date('Y_m');
 if (isset($_GET['action']) && $_GET['action'] === 'dismiss_alerts') {
     $_SESSION[$dismiss_key] = true;
@@ -44,11 +43,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'dismiss_alerts') {
     exit();
 }
 
-// =================================================================
-// ✅ FETCHING ALL DASHBOARD DATA FROM DATABASE
-// =================================================================
 
-// --- 1. Main Card Data ---
 $totalFlats = 0;
 $totalTenants = 0;
 $monthlyIncome = 0;
@@ -66,7 +61,7 @@ $monthlyIncome = $result->fetch_assoc()['total'] ?? 0;
 $result = $conn->query("SELECT COUNT(*) as count FROM maintenance_requests WHERE landlord_id = $landlord_id AND status = 'Pending'");
 $pendingMaintenance = $result->fetch_assoc()['count'];
 
-// --- 2. Analytics Data ---
+
 $occupiedFlats = 0;
 $occupancyRate = 0;
 $totalDue = 0;
@@ -92,7 +87,7 @@ $result = $stmt->get_result();
 $totalDue = $result->fetch_assoc()['total_due'] ?? 0;
 $stmt->close();
 
-// --- 3. Late Payment Notifications ---
+
 $lateTenants = [];
 $currentDay = date('d');
 

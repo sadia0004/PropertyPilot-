@@ -3,35 +3,35 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Standardized session check for tenants
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'tenant') {
     header("Location: login.php");
     exit();
 }
 $tenant_id = $_SESSION['user_id'];
 
-// Retrieve user data from session for the navbar
+
 $fullName_session = $_SESSION['fullName'] ?? 'Tenant';
 $profilePhoto_session = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette for Tenant Dashboard ---
+
 $primaryDark = '#1B3C53';
 $primaryAccent = '#2CA58D';
 $textColor = '#E0E0E0';
 $secondaryBackground = '#F0F2F5';
 $cardBackground = '#FFFFFF';
 
-// Initialize messages
+
 $message = '';
 $message_type = '';
 
-// --- DB Connection ---
+
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// --- Fetch Tenant's, Landlord's, and Property Info ---
+
 $landlord_id = null;
 $property_id = null;
 $tenant_info = [];
@@ -60,7 +60,7 @@ if ($infoRow = $infoResult->fetch_assoc()) {
 $stmt_info->close();
 
 
-// --- Handle Maintenance Request Form Submission ---
+//Handle Maintenance Request Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($landlord_id) || empty($property_id)) {
         $message = "Could not submit request. Your apartment details are not fully configured.";
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $permissionToEnter = isset($_POST['permission_to_enter']) ? 1 : 0;
         $photoPath = null;
 
-        // Handle file upload
+      
         if (isset($_FILES['photo_upload']) && $_FILES['photo_upload']['error'] == 0) {
             $uploadDir = "uploads/";
             if (!is_dir($uploadDir)) {
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Insert into database if no upload error
+     
         if (empty($message)) {
             $stmt = $conn->prepare("INSERT INTO maintenance_requests (tenant_id, landlord_id, property_id, issue_category, issue_description, photo, permission_to_enter, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')");
             $stmt->bind_param("iiisssi", $tenant_id, $landlord_id, $property_id, $category, $description, $photoPath, $permissionToEnter);

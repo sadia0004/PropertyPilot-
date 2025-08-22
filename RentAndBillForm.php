@@ -3,31 +3,29 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Standardized session check
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Check the role of the user
+
 $userRole = $_SESSION['userRole'] ?? 'tenant';
 if ($userRole !== 'landlord') {
     die("Access Denied: This page is for landlords only.");
 }
 $landlord_id = $_SESSION['user_id'];
 
-// Retrieve user data from session
+
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// Define the consistent brand color palette
 $primaryDark = '#021934';
 $primaryAccent = '#2c5dbd';
 $textColor = '#f0f4ff';
 $secondaryBackground = '#f0f4ff';
 $cardBackground = '#ffffff';
 
-// Action button colors
 $actionAdd = '#28a745';
 $actionBilling = '#ffc107';
 $actionViewRentList = '#17a2b8';
@@ -36,11 +34,11 @@ $actionApartmentList = '#6c757d';
 $actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
 
-// Initialize messages
+
 $successMsg = "";
 $errorMsg = "";
 
-// ✅ DB connection
+
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -50,7 +48,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// ✅ Fetch all tenant details for the logged-in landlord
 $tenantDetails = [];
 $detailsQuery = "SELECT tenant_id, name, apartment_no, monthly_rent FROM addtenants WHERE landlord_id = ?";
 $stmt_details = $conn->prepare($detailsQuery);
@@ -62,7 +59,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt_details->close();
 
-// ✅ Handle form submission
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tenant_id = $_POST['tenant_id'] ?? 0;
     $apartment_no = $_POST['apartment_no'] ?? '';
@@ -155,7 +152,7 @@ $conn->close();
           width: 100%;
           display: flex;
           flex-direction: column;
-          gap: 6px; /* Reduced gap between buttons */
+          gap: 6px;
           align-items: center;
           border-top: 1px solid rgba(255, 255, 255, 0.1);
           
@@ -163,12 +160,12 @@ $conn->close();
         .vertical-sidebar .action-buttons h3 {
           color: #f0f4ff;
           font-size: 1.1em;
-          margin-bottom: 8px; /* Reduced margin */
+          margin-bottom: 8px; 
           text-transform: uppercase;
         }
         .vertical-sidebar .action-link {
           width: calc(100% - 30px);
-          padding: 8px 12px; /* Reduced vertical padding */
+          padding: 8px 12px; 
           border-radius: 8px;
           color: #f0f4ff;
           font-weight: 600;

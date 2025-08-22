@@ -1,14 +1,14 @@
 <?php
-// --- DB Connection ---
+
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) { die("Connection failed: " . $conn->connect_error); }
 
-// --- Handle Search and Filter ---
+
 $location = $_GET['location'] ?? '';
 $price_range = $_GET['price_range'] ?? '';
 $sort = $_GET['sort'] ?? 'date_desc';
 
-// --- Fetch Vacancy Posts ---
+//Fetch Vacancy Posts
 $vacancy_posts = [];
 $base_query = "
     SELECT 
@@ -49,7 +49,6 @@ if ($result) {
 }
 $stmt->close();
 
-// --- Fetch Platform Stats ---
 $totalLandlords = $conn->query("SELECT COUNT(*) as count FROM users WHERE userRole = 'landlord'")->fetch_assoc()['count'];
 $totalTenants = $conn->query("SELECT COUNT(*) as count FROM users WHERE userRole = 'tenant'")->fetch_assoc()['count'];
 $totalProperties = $conn->query("SELECT COUNT(*) as count FROM properties")->fetch_assoc()['count'];
@@ -720,7 +719,6 @@ $conn->close();
 
 
     <script>
-        // Enhanced slideshow functionality
         let slideIndices = {};
         
         function moveSlide(postId, direction) {
@@ -746,7 +744,7 @@ $conn->close();
             track.style.transform = `translateX(-${slideIndices[postId] * 100}%)`;
         }
 
-        // Auto-advance slideshow
+
         setInterval(() => {
             document.querySelectorAll('.slideshow-container').forEach(container => {
                 const postId = container.querySelector('.slideshow-track').id.split('-')[1];
@@ -757,7 +755,6 @@ $conn->close();
             });
         }, 5000);
 
-        // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -771,7 +768,7 @@ $conn->close();
             });
         });
 
-        // Add scroll effect to navbar
+    
         window.addEventListener('scroll', () => {
             const navbar = document.querySelector('header');
             if (window.scrollY > 100) {

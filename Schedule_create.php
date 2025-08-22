@@ -3,13 +3,13 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Standardized session check
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Check the role of the user
+
 $userRole = $_SESSION['userRole'] ?? 'tenant';
 if ($userRole !== 'landlord') {
     die("Access Denied: This page is for landlords only.");
@@ -17,27 +17,27 @@ if ($userRole !== 'landlord') {
 $landlord_id = $_SESSION['user_id'];
 
 
-// Retrieve user data from session
+
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// Define the consistent brand color palette
+
 $primaryDark = '#021934';
 $primaryAccent = '#2c5dbd';
 $textColor = '#f0f4ff';
 $secondaryBackground = '#f0f4ff';
 $cardBackground = '#ffffff';
 
-// Action button colors - Professional and distinct palette
-$actionAdd = '#28a745';      // Green for 'Add Tenant'
-$actionBilling = '#ffc107';   // Yellow for 'Rent & Bills'
-$actionViewRentList = '#17a2b8';  // Teal for 'View Rent List'
-$actionViewTenantList = '#6f42c1'; // Purple for 'View Tenant List'
-$actionApartmentList = '#6c757d';// Grey for 'Apartment List'
-$actionScheduleCreate = '#832d31ff';   // Magenta for 'Create Schedule'
-$actionScheduleDetails = '#fd7e14'; // Orange for 'Schedule Details'
 
-// Initialize messages and form data
+$actionAdd = '#28a745';     
+$actionBilling = '#ffc107';  
+$actionViewRentList = '#17a2b8';  
+$actionViewTenantList = '#6f42c1'; 
+$actionApartmentList = '#6c757d';
+$actionScheduleCreate = '#832d31ff';  
+$actionScheduleDetails = '#fd7e14'; 
+
+
 $successMsg = "";
 $errorMsg = "";
 $formData = [
@@ -72,9 +72,9 @@ while ($row = $result->fetch_assoc()) {
 $stmt_tenants->close();
 
 
-// ✅ Handle form submission
+//Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Repopulate form data from POST
+  
     $formData['tenant_ids'] = $_POST['tenant_ids'] ?? [];
     $formData['meetingType'] = trim($_POST['meetingType'] ?? 'In-Person');
     $formData['meeting_link'] = trim($_POST['meeting_link'] ?? '');
@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $formData['date'] = trim($_POST['date'] ?? '');
     $formData['time'] = trim($_POST['time'] ?? '');
 
-    // ✅ Server-side validation
+    //Server-side validation
     if (empty($formData['tenant_ids']) || empty($formData['date']) || empty($formData['time'])) {
         $errorMsg = "❌ Please select at least one tenant and fill in the date and time.";
     } elseif ($formData['meetingType'] === 'Online' && empty($formData['meeting_link'])) {
@@ -139,7 +139,7 @@ $conn->close();
   <title>Schedule Meeting - PropertyPilot</title>
 
   <style>
-    /* Global box-sizing for consistent layouts */
+  
     *, *::before, *::after {
         box-sizing: border-box;
     }

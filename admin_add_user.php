@@ -3,18 +3,18 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Protect the page: allow only logged-in admins
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
 $admin_id = $_SESSION['user_id'];
 
-// Retrieve user data from session for the header
+
 $fullName_header = $_SESSION['fullName'] ?? 'Admin';
 $profilePhoto_header = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette ---
+
 $primaryDark = '#0A0908';
 $primaryAccent = '#491D8B';
 $textColor = '#F2F4F3';
@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($rawPassword !== $confirmPassword) {
         $errorMsg = "Passwords do not match.";
     } else {
-        // Check for duplicate email or NID
+       
         $checkStmt = $conn->prepare("SELECT email, nationalId FROM users WHERE email = ? OR nationalId = ?");
         $checkStmt->bind_param("ss", $email, $nationalId);
         $checkStmt->execute();
@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $checkStmt->close();
     }
 
-    // If no error, proceed
+
     if (empty($errorMsg)) {
         $hashedPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
 
@@ -78,14 +78,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $conn->begin_transaction();
         try {
-            // 1. Insert into users table
+           
             $insertStmt = $conn->prepare("INSERT INTO users (fullName, email, phoneNumber, password, profilePhoto, nationalId, userRole) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $insertStmt->bind_param("sssssss", $fullName, $email, $phoneNumber, $hashedPassword, $profilePhoto, $nationalId, $userRole);
             $insertStmt->execute();
             $newUserId = $insertStmt->insert_id;
             $insertStmt->close();
 
-            // 2. If user is a tenant, also add to `addtenants` and update property
+          
             if ($userRole === 'tenant') {
                 $landlord_id = $_POST['landlord_id'];
                 $apartment_no = $_POST['apartment_no'];
@@ -112,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-// Fetch landlords and their vacant apartments for the dropdowns
+
 $landlordsWithApartments = [];
 $landlordQuery = "SELECT u.id, u.fullName FROM users u WHERE u.userRole = 'landlord'";
 $landlordResult = $conn->query($landlordQuery);
@@ -245,7 +245,7 @@ $conn->close();
                         <div class="form-group"><label for="profilePhoto">Profile Photo</label><input type="file" id="profilePhoto" name="profilePhoto" accept="image/*"></div>
                     </div>
                     
-                    <!-- Tenant Specific Fields -->
+                 
                     <div id="tenant-fields" class="form-row">
                         <div class="form-group">
                             <label for="landlord_id">Assign to Landlord</label>
@@ -311,13 +311,13 @@ $conn->close();
                     const option = document.createElement('option');
                     option.value = apt.apartment_no;
                     option.textContent = apt.apartment_no;
-                    option.dataset.rent = apt.apartment_rent; // Store rent in data attribute
+                    option.dataset.rent = apt.apartment_rent; 
                     apartmentSelect.appendChild(option);
                 });
             } else {
                 apartmentSelect.innerHTML = '<option value="">Select Landlord First</option>';
             }
-            updateRent(); // Clear rent when landlord changes
+            updateRent(); 
         }
 
         function updateRent() {

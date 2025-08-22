@@ -3,7 +3,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Standardized session check for tenants
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'tenant') {
     header("Location: login.php");
     exit();
@@ -14,18 +14,18 @@ $tenant_id = $_SESSION['user_id'];
 $fullName_session = $_SESSION['fullName'] ?? 'Tenant';
 $profilePhoto_session = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette for Tenant Dashboard ---
-$primaryDark = '#1B3C53'; // UPDATED COLOR
-$primaryAccent = '#2CA58D'; // A contrasting teal for highlights
-$textColor = '#E0E0E0'; // Soft white for text
-$secondaryBackground = '#F0F2F5'; // Light grey for the main content area
+
+$primaryDark = '#1B3C53'; 
+$primaryAccent = '#2CA58D'; 
+$textColor = '#E0E0E0'; 
+$secondaryBackground = '#F0F2F5'; 
 $cardBackground = '#FFFFFF';
 
-// Initialize messages
+
 $message = '';
 $message_type = '';
 
-// --- DB Connection ---
+
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -35,7 +35,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// --- Handle Form Submission (POST Request) ---
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fullName = trim($_POST['fullName']);
     $email = trim($_POST['email']);
@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $conn->begin_transaction();
         try {
-            // --- Update Users Table ---
+            
             $update_fields_users = [];
             $params_users = [];
             $types_users = "";

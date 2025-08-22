@@ -20,7 +20,7 @@ if (!$schedule_id) {
 $errorMsg = "";
 $scheduleData = null;
 
-// DB Connection
+
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Fetch the existing schedule data to pre-fill the form
+
 $fetchQuery = "SELECT * FROM meeting_schedule WHERE scheduleID = ? AND landlord_id = ?";
 $stmt = $conn->prepare($fetchQuery);
 $stmt->bind_param("ii", $schedule_id, $landlord_id);
@@ -90,7 +90,7 @@ if (!$scheduleData) {
         input[type="date"], input[type="time"], textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; box-sizing: border-box; }
         .error { padding: 1rem; background-color: #f8d7da; color: #721c24; border-radius: 5px; margin-bottom: 1.5rem; text-align: center; }
 
-        /* --- STYLES FOR ACTION BUTTONS --- */
+       
         .form-actions {
             flex-basis: 100%;
             display: flex;
@@ -115,16 +115,15 @@ if (!$scheduleData) {
             margin-right: 8px;
         }
 
-        /* Update button (Green) */
+   
         .btn-update {
             background-color: #28a745;
-            flex-grow: 2; /* Takes more space */
+            flex-grow: 2; 
         }
         .btn-update:hover {
             background-color: #218838;
         }
-        
-        /* Back button (Grey) */
+  
         .btn-back {
             background-color: #6c757d;
         }

@@ -3,14 +3,14 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Protect the page: allow only logged-in landlords
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'landlord') {
     header("Location: login.php");
     exit();
 }
 $landlord_id = $_SESSION['user_id'];
 
-// --- Define Color Palette (from Dashboard) ---
+
 $primaryDark = '#021934';
 $primaryAccent = '#2c5dbd';
 $textColor = '#f0f4ff';
@@ -26,7 +26,6 @@ $actionScheduleDetails = '#fd7e14';
 $actionMaintenance = '#dc3545';
 
 
-// --- Database Connection ---
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -39,7 +38,7 @@ if ($conn->connect_error) {
 $message = '';
 $message_type = '';
 
-// --- Handle Form Submission (POST Request) ---
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fullName = trim($_POST['fullName']);
     $phoneNumber = trim($_POST['phoneNumber']);
@@ -55,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $params = [];
         $types = "";
 
-        // Prepare fields for update
+
         $update_fields[] = "fullName = ?";
         $params[] = $fullName;
         $types .= "s";
@@ -77,7 +76,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        // Handle Profile Photo Upload
         if (isset($_FILES['profilePhoto']) && $_FILES['profilePhoto']['error'] == 0) {
             $uploadDir = 'uploads/';
             if (!is_dir($uploadDir)) {
@@ -104,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        // If no errors, proceed with database update
+      
         if (empty($message)) {
             $params[] = $landlord_id;
             $types .= "i";
@@ -116,7 +114,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($stmt->execute()) {
                 $message = "Profile updated successfully!";
                 $message_type = 'success';
-                // Update session variables to reflect changes immediately
                 $_SESSION['fullName'] = $fullName;
                 if (isset($targetFilePath)) {
                     $_SESSION['profilePhoto'] = $targetFilePath;
@@ -130,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Fetch the latest user data for display
+
 $stmt_fetch = $conn->prepare("SELECT fullName, email, phoneNumber, profilePhoto, nationalId FROM users WHERE id = ?");
 $stmt_fetch->bind_param("i", $landlord_id);
 $stmt_fetch->execute();
@@ -149,7 +146,7 @@ $profilePhoto = (!empty($user['profilePhoto']) && file_exists($user['profilePhot
     <title>My Profile - PropertyPilot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- Base styles from Dashboard --- */
+       
         *, *::before, *::after { box-sizing: border-box; }
         body {
             margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -197,7 +194,7 @@ $profilePhoto = (!empty($user['profilePhoto']) && file_exists($user['profilePhot
         .vertical-sidebar .link-schedule-details { background-color: <?php echo $actionScheduleDetails; ?>; }
         main { flex-grow: 1; padding: 40px; height: 100%; overflow-y: auto; }
 
-        /* --- Styles specific to Profile page --- */
+     
         .profile-container {
             max-width: 800px; margin: 0 auto; background: #fff; padding: 40px;
             border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);

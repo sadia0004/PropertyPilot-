@@ -3,27 +3,25 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Standardized session check for TENANT
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'tenant') {
     header("Location: login.php");
     exit();
 }
 $tenant_id = $_SESSION['user_id'];
 
-// --- Define Color Palette from Tenant Dashboard ---
 $primaryDark = '#1B3C53'; 
 $primaryAccent = '#2CA58D';
 $textColor = '#E0E0E0'; 
 $secondaryBackground = '#F0F2F5';
 $cardBackground = '#FFFFFF';
 
-// --- DB Connection ---
+
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// --- Fetch User Info ---
 $fullName = "Tenant";
 $profilePhoto = "default-avatar.png";
 $queryUser = "SELECT fullName, profilePhoto FROM users WHERE id = ?";
@@ -38,14 +36,14 @@ if ($rowUser = $resultUser->fetch_assoc()) {
 $stmtUser->close();
 
 
-// ✅ Handle Clear History Request using Sessions
+
 if (isset($_GET['action']) && $_GET['action'] === 'clear_history') {
     $_SESSION['history_cleared'] = true;
     header("Location: tenant_notifications.php");
     exit();
 }
 
-// ✅ Fetch upcoming meeting schedules
+//Fetch upcoming meeting schedules
 $upcoming_notifications = [];
 $query_upcoming = "
     SELECT ms.*, u.fullName AS landlord_name
@@ -94,7 +92,7 @@ $conn->close();
     <title>My Notifications</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- Base styles from Tenant Dashboard --- */
+       
         *, *::before, *::after { box-sizing: border-box; }
         body {
           margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

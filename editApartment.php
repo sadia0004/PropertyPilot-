@@ -3,13 +3,13 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// --- Session, UI Variables, and DB Setup ---
+
 if (!isset($_SESSION['landlord_id'])) {
     die("Unauthorized access.");
 }
 $landlord_id = $_SESSION['landlord_id'];
 
-// Retrieve user data for UI
+
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
@@ -20,7 +20,7 @@ $database = "property";
 $conn = new mysqli($host, $username, $password, $database);
 if ($conn->connect_error) { die("Connection failed: " . $conn->connect_error); }
 
-// --- Initial Data Fetch ---
+
 $errorMsg = "";
 $successMsg = "";
 if (!isset($_GET['id'])) {
@@ -28,7 +28,7 @@ if (!isset($_GET['id'])) {
 }
 $property_id = intval($_GET['id']);
 
-// Fetch the specific apartment, ensuring it belongs to the logged-in landlord
+// Fetch the specific apartment
 $stmt = $conn->prepare("SELECT * FROM properties WHERE property_id = ? AND landlord_id = ?");
 $stmt->bind_param("ii", $property_id, $landlord_id);
 $stmt->execute();
@@ -39,19 +39,17 @@ if ($result->num_rows === 0) {
 $apartment = $result->fetch_assoc();
 $stmt->close();
 
-// --- Handle Form Submission (Update Logic) ---
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Current status from before the update
-    $current_status = $apartment['apartment_status'];
 
-    // Data from the submitted form
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  
+    $current_status = $apartment['apartment_status'];
     $apartment_rent = $_POST['apartment_rent'];
     $apartment_status = $_POST['apartment_status'];
     $floor_no = $_POST['floor_no'];
     $apartment_type = $_POST['apartment_type'];
     $apartment_size = $_POST['apartment_size'];
 
-    // ✅ Backend Safety Check: Enforce the core rule
+    
     if ($current_status === 'Vacant' && $apartment_status === 'Occupied') {
         $errorMsg = "❌ You cannot manually change a 'Vacant' apartment to 'Occupied'.";
     } else {
@@ -117,14 +115,14 @@ $brandColors = [
         }
         .vertical-sidebar .action-link:hover {
             transform: translateX(5px);
-            background-color: rgba(255, 255, 255, 0.1) !important; /* Use !important to override base color on hover */
+            background-color: rgba(255, 255, 255, 0.1) !important; 
         }
         .vertical-sidebar .action-link.active {
             background-color: <?php echo $brandColors['primaryAccent']; ?> !important;
             
         }
         
-        /* Specific background colors for each action button */
+        
         .link-add-tenant { background-color: <?php echo $brandColors['actionAdd']; ?>; }
         .link-view-tenants { background-color: <?php echo $brandColors['actionViewTenantList']; ?>; }
         .link-apartment-list { background-color: <?php echo $brandColors['actionApartmentList']; ?>; }

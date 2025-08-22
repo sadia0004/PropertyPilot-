@@ -286,23 +286,17 @@ $conn->close();
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($rent_list as $record): 
-                                    // GET PAID AND DUE AMOUNTS
+                                   
                                     $paid_amount = $record['total_paid'] ?? 0;
                                     $initial_bill_total = $record['rent_amount'] + $record['water_bill'] + $record['utility_bill'] + $record['guard_bill'] + $record['previous_due'];
                                     $due_amount = $record['latest_due_amount'] ?? $initial_bill_total;
                                     
-                                    // =================================================================
-                                    // ✅ **WORKAROUND LOGIC**
-                                    // This reconstructs the original total bill by adding the amount paid to the current due amount.
-                                    // This is a temporary fix. The REAL fix is in your payment processing script.
                                     if ($paid_amount > 0) {
                                         $total_bill = $paid_amount + $due_amount;
                                     } else {
                                         $total_bill = $initial_bill_total;
                                     }
-                                    // =================================================================
-
-                                    // DETERMINE STATUS
+                     
                                     $status = $record['latest_status'] ?? 'Unpaid';
                                     $status_class = 'status-unpaid';
                                     if ($status === 'Paid') {

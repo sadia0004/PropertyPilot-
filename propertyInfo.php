@@ -3,23 +3,18 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Check if landlord is logged in
+
 if (!isset($_SESSION['landlord_id'])) {
-    // In a real app, you'd probably redirect:
-    // header("Location: login.php");
-    // exit();
+  
     die("Unauthorized access. Please log in as a landlord.");
 }
 $landlord_id = $_SESSION['landlord_id'];
 
-// Retrieve user data for UI (Using session data from your dashboard example)
-$_SESSION['userRole'] = 'landlord'; // Assuming this for the sidebar logic
+$_SESSION['userRole'] = 'landlord'; 
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// =================================================================
-// ✅ COPIED BRAND COLOR PALETTE FROM DASHBOARD FOR CONSISTENCY
-// =================================================================
+
 $primaryDark = '#021934';
 $primaryAccent = '#2c5dbd';
 $textColor = '#f0f4ff';
@@ -33,21 +28,19 @@ $actionApartmentList = '#6c757d';
 $actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
 $actionMaintenance = '#dc3545';
-// =================================================================
 
-// Initialize messages and form data
 $successMsg = "";
 $errorMsg = "";
 $formData = [
     'apartment_no' => '',
     'apartment_rent' => '',
-    'apartment_status' => 'Vacant', // Default to Vacant
+    'apartment_status' => 'Vacant', 
     'floor_no' => '',
     'apartment_type' => '',
     'apartment_size' => ''
 ];
 
-// ✅ DB connection
+
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -57,7 +50,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// ✅ Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     foreach ($formData as $key => &$value) {
         if ($key !== 'apartment_status') {
@@ -65,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // ✅ Server-side validation
+
     if (empty($formData['apartment_no']) || empty($formData['apartment_rent'])) {
         $errorMsg = "❌ Please fill in all required fields.";
     } elseif (!is_numeric($formData['apartment_rent']) || $formData['apartment_rent'] <= 0) {
@@ -73,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!empty($formData['apartment_size']) && (!is_numeric($formData['apartment_size']) || $formData['apartment_size'] <= 0)) {
         $errorMsg = "❌ Apartment size must be a positive number.";
     } else {
-        // ✅ Proceed with DB insert
+       
         $stmt = $conn->prepare("INSERT INTO properties (landlord_id, apartment_no, apartment_rent, apartment_status, floor_no, apartment_type, apartment_size) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param(
             "isdsssi",

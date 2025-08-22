@@ -3,47 +3,46 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Standardized session check for tenants
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'tenant') {
     header("Location: login.php");
     exit();
 }
 $tenant_id = $_SESSION['user_id'];
 
-// Retrieve user data from session for the navbar
+
 $fullName_session = $_SESSION['fullName'] ?? 'Tenant';
 $profilePhoto_session = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette for Tenant Dashboard ---
+
 $primaryDark = '#1B3C53';
 $primaryAccent = '#2CA58D';
 $textColor = '#E0E0E0';
 $secondaryBackground = '#F0F2F5';
 
-// Initialize messages
+
 $message = '';
 $message_type = '';
 
-// --- DB Connection ---
+
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get data from the previous page
+
 $rent_id = $_GET['rent_id'] ?? 0;
 $total_amount = $_GET['amount'] ?? 0;
 $landlord_id = $_GET['landlord_id'] ?? 0;
 $payment_method = $_GET['payment_method'] ?? 'Card';
 
-// --- Auto-generate Transaction Details ---
-$transaction_id = uniqid('TXN-'); // Generate a unique string ID
+$transaction_id = uniqid('TXN-'); 
 
-// --- Handle Fake Payment Submission ---
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_payment'])) {
     
     $paid_amount = filter_var($_POST['paid_amount'], FILTER_VALIDATE_FLOAT);
-    $transaction_id_post = $_POST['transaction_id']; // Get the generated ID from the form
+    $transaction_id_post = $_POST['transaction_id']; 
 
     if ($paid_amount > 0 && $paid_amount <= $total_amount) {
         $due_amount = $total_amount - $paid_amount;
@@ -51,13 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_payment'])) {
 
         $conn->begin_transaction();
         try {
-            // 1. Insert into transactions table
+         
             $stmt_trans = $conn->prepare("INSERT INTO transactions (transaction_id, rent_id, tenant_id, landlord_id, amount, due_amount, payment_method, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt_trans->bind_param("siiiddss", $transaction_id_post, $rent_id, $tenant_id, $landlord_id, $paid_amount, $due_amount, $payment_method, $transaction_status);
             $stmt_trans->execute();
             $stmt_trans->close();
 
-            // 2. Update the status in the rentandbill table
+          
             $new_bill_status = ($due_amount <= 0) ? 'Paid' : 'Partially Paid';
             $stmt_update = $conn->prepare("UPDATE rentandbill SET previous_due = ?, rent_amount = 0, water_bill = 0, utility_bill = 0, guard_bill = 0, satus = ? WHERE rent_id = ?");
             $stmt_update->bind_param("dsi", $due_amount, $new_bill_status, $rent_id);

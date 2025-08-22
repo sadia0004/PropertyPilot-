@@ -17,12 +17,12 @@ if ($conn->connect_error) {
 $errorMsg = "";
 $successMsg = "";
 
-// Check if redirected from registration
+
 if (isset($_GET['registered']) && $_GET['registered'] === 'success') {
     $successMsg = "Registration successful! Please login below.";
 }
 
-// Handle login
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $inputPassword = $_POST['password'];
@@ -37,20 +37,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->fetch();
 
         if (password_verify($inputPassword, $hashedPassword)) {
-            // Store common session data
+           
             $_SESSION['user_id'] = $id;
             $_SESSION['fullName'] = $fullName;
             $_SESSION['profilePhoto'] = $profilePhoto;
             $_SESSION['userRole'] = $userRole;
 
-            // Redirect based on user role
+          
             if ($userRole === "landlord") {
                 $_SESSION['landlord_id'] = $id;
                 header("Location: landlord_dashboard.php");
             } elseif ($userRole === "tenant") {
                 $_SESSION['tenant_id'] = $id;
                 header("Location: tenant_dashboard.php");
-            } elseif ($userRole === "admin") { // ✅ ADDED ADMIN REDIRECT
+            } elseif ($userRole === "admin") { 
                 $_SESSION['admin_id'] = $id;
                 header("Location: admin_dashboard.php");
             } else {

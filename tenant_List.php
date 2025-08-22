@@ -3,29 +3,27 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Standardized session check to match your dashboard
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Check the role of the user
+
 $userRole = $_SESSION['userRole'] ?? 'tenant';
 if ($userRole !== 'landlord') {
     die("Access Denied: This page is for landlords only.");
 }
 $landlord_id = $_SESSION['user_id'];
 
-// Retrieve user data from session
+
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// Define the consistent brand color palette
+
 $primaryDark = '#021934';
 $textColor = '#f0f4ff';
 $secondaryBackground = '#f0f4ff';
-
-// Action button colors
 $actionAdd = '#28a745';
 $actionBilling = '#ffc107';
 $actionViewRentList = '#17a2b8';
@@ -34,11 +32,11 @@ $actionApartmentList = '#6c757d';
 $actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
 
-// Initialize messages
+
 $successMsg = "";
 $errorMsg = "";
 
-// ✅ DB connection
+
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -48,11 +46,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// ✅ Handle Delete Action
 if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
     $tenant_id_to_delete = $_GET['id'];
-
-    // First, find the apartment number associated with the tenant to update its status
     $apartment_no_to_vacate = '';
     $find_apt_stmt = $conn->prepare("SELECT apartment_no FROM addtenants WHERE tenant_id = ? AND landlord_id = ?");
     $find_apt_stmt->bind_param("ii", $tenant_id_to_delete, $landlord_id);
@@ -66,20 +61,16 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
     if (!empty($apartment_no_to_vacate)) {
         $conn->begin_transaction();
         try {
-            // 1. Delete the tenant from the addtenants list
+          
             $deleteStmt = $conn->prepare("DELETE FROM addtenants WHERE tenant_id = ? AND landlord_id = ?");
             $deleteStmt->bind_param("ii", $tenant_id_to_delete, $landlord_id);
             $deleteStmt->execute();
             $deleteStmt->close();
-
-            // 2. Update the property's status back to 'Vacant'
             $updateStmt = $conn->prepare("UPDATE properties SET apartment_status = 'Vacant' WHERE apartment_no = ? AND landlord_id = ?");
             $updateStmt->bind_param("si", $apartment_no_to_vacate, $landlord_id);
             $updateStmt->execute();
             $updateStmt->close();
-
             $conn->commit();
-            // Redirect to the same page to remove the GET parameters from the URL
             header("Location: view_tenants.php?delete_success=1");
             exit();
         } catch (mysqli_sql_exception $exception) {
@@ -89,13 +80,13 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
     }
 }
 
-// Display success message after redirect
+
 if (isset($_GET['delete_success'])) {
     $successMsg = "✅ Tenant removed successfully and the apartment is now marked as vacant.";
 }
 
 
-// ✅ Handle Search
+
 $search_apartment = $_GET['search_apartment'] ?? '';
 $tenants_list = [];
 

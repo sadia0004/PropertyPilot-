@@ -3,7 +3,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Standardized session check to match your dashboard
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -14,18 +14,16 @@ $userRole = $_SESSION['userRole'] ?? 'tenant';
 if ($userRole !== 'landlord') {
     die("Access Denied: This page is for landlords only.");
 }
-$landlord_id = $_SESSION['user_id']; // Use 'user_id' for consistency
+$landlord_id = $_SESSION['user_id']; 
 
 // Retrieve user data from session
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// Define the consistent brand color palette
+
 $primaryDark = '#021934';
 $textColor = '#f0f4ff';
 $secondaryBackground = '#f0f4ff';
-
-// Action button colors
 $actionAdd = '#28a745';
 $actionBilling = '#ffc107';
 $actionViewRentList = '#17a2b8';
@@ -34,11 +32,11 @@ $actionApartmentList = '#6c757d';
 $actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
 
-// Initialize messages
+
 $successMsg = "";
 $errorMsg = "";
 
-// Variables to hold form values for repopulation on error
+
 $tenantName_val = '';
 $apartmentNo_val = '';
 $monthlyRent_val = '';
@@ -56,7 +54,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// ✅ CORRECTED: Fetch ALL apartments for the dropdown
+
 $apartments = [];
 $query = "SELECT apartment_no FROM properties WHERE landlord_id = ?";
 $stmt = $conn->prepare($query);
@@ -68,7 +66,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Fetch tenant details when apartment is selected via GET
+
 if (isset($_GET['apartment_no'])) {
     $apartmentNo_val = $_GET['apartment_no'];
 

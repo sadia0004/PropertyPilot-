@@ -3,19 +3,19 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Protect the page: allow only logged-in landlords
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'landlord') {
     header("Location: login.php");
     exit();
 }
 $landlord_id = $_SESSION['user_id'];
 
-// Retrieve user data from session
+
 $fullName = $_SESSION['fullName'];
 $profilePhoto = $_SESSION['profilePhoto'] ?: "default-avatar.png";
 $userRole = $_SESSION['userRole'];
 
-// --- Color Palette from your Dashboard ---
+
 $primaryDark = '#021934';
 $primaryAccent = '#2c5dbd';
 $textColor = '#f0f4ff';
@@ -28,10 +28,10 @@ $actionViewTenantList = '#6f42c1';
 $actionApartmentList = '#6c757d';
 $actionScheduleCreate = '#832d31ff';
 $actionScheduleDetails = '#fd7e14';
-$actionMaintenance = '#dc3545'; // Used for Delete
-$actionEdit = '#007bff'; // Blue for Edit
+$actionMaintenance = '#dc3545'; 
+$actionEdit = '#007bff'; 
 
-// --- Database Connection ---
+
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -41,11 +41,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// --- Handle POST Actions (Delete, Clear History) ---
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $action = $_POST['action'] ?? '';
 
-    // Action to delete a single meeting
+  
     if ($action === 'delete_single' && isset($_POST['scheduleID'])) {
         $scheduleID = filter_input(INPUT_POST, 'scheduleID', FILTER_VALIDATE_INT);
         $stmt = $conn->prepare("DELETE FROM meeting_schedule WHERE scheduleID = ? AND landlord_id = ?");
@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
     
-    // Redirect to prevent form resubmission
+
     header("Location: scheduleInfo.php");
     exit();
 }
@@ -81,8 +81,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $today = date('Y-m-d');
 $upcoming_schedules = [];
 $past_schedules = [];
-
-// Fetch Upcoming Meetings (today and future)
 $stmt_upcoming = $conn->prepare("SELECT * FROM meeting_schedule WHERE landlord_id = ? AND date >= ? ORDER BY date ASC, time ASC");
 $stmt_upcoming->bind_param("is", $landlord_id, $today);
 $stmt_upcoming->execute();
@@ -92,7 +90,7 @@ while ($row = $result_upcoming->fetch_assoc()) {
 }
 $stmt_upcoming->close();
 
-// Fetch Past Meetings (history)
+
 $stmt_past = $conn->prepare("SELECT * FROM meeting_schedule WHERE landlord_id = ? AND date < ? ORDER BY date DESC, time DESC");
 $stmt_past->bind_param("is", $landlord_id, $today);
 $stmt_past->execute();

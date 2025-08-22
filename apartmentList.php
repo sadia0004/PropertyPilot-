@@ -3,29 +3,27 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// --- DASHBOARD UI INTEGRATION ---
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
-// Specific check for this page's logic
+
 if (!isset($_SESSION['landlord_id'])) {
     die("Unauthorized access. Please log in as a landlord.");
 }
 $landlord_id = $_SESSION['landlord_id'];
 
-// Retrieve user data for UI
+
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?: "default-avatar.png";
 
-// DB connection
 $host = "localhost"; $username = "root"; $password = ""; $database = "property";
 $conn = new mysqli($host, $username, $password, $database);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Handle Delete Action
 if (isset($_GET['delete_id'])) {
     $delete_id = (int)$_GET['delete_id'];
     $stmt = $conn->prepare("DELETE FROM properties WHERE property_id = ? AND landlord_id = ?");
@@ -73,7 +71,7 @@ $brandColors = [
         .vertical-sidebar .nav-links a:hover,
         .vertical-sidebar .nav-links a.active { background-color: <?php echo $brandColors['primaryAccent']; ?>; }
 
-        /* Action Buttons Section - Corrected CSS */
+        /* Action Buttons Section  */
         .vertical-sidebar .action-buttons { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 11px; }
         .vertical-sidebar .action-buttons h3 { color: <?php echo $brandColors['textColor']; ?>; font-size: 1.1em; margin-bottom: 10px; text-transform: uppercase; }
         .vertical-sidebar .action-link {
@@ -90,7 +88,7 @@ $brandColors = [
             background-color: <?php echo $brandColors['primaryAccent']; ?> !important;
         }
         
-        /* Specific background colors for each action button */
+       
         .link-add-tenant { background-color: <?php echo $brandColors['actionAdd']; ?>; }
         .link-view-tenants { background-color: <?php echo $brandColors['actionViewTenantList']; ?>; }
         .link-apartment-list { background-color: <?php echo $brandColors['actionApartmentList']; ?>; }

@@ -3,30 +3,28 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Standardized session check for tenants
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'tenant') {
     header("Location: login.php");
     exit();
 }
 $tenant_id = $_SESSION['user_id'];
 
-// Retrieve user data from session for the navbar
 $fullName_session = $_SESSION['fullName'] ?? 'Tenant';
 $profilePhoto_session = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette for Tenant Dashboard ---
+
 $primaryDark = '#1B3C53';
 $primaryAccent = '#2CA58D';
 $textColor = '#E0E0E0';
 $secondaryBackground = '#F0F2F5';
 
-// --- DB Connection ---
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// --- Fetch Unpaid Bills for the Tenant ---
+
 $unpaid_bills = [];
 $query = "SELECT * FROM rentandbill WHERE tenant_id = ? AND (satus IS NULL OR satus != 'Paid') ORDER BY billing_date DESC";
 $stmt = $conn->prepare($query);

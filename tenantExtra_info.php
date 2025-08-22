@@ -3,13 +3,12 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Ensure a pending tenant's data exists in the session
+
 if (!isset($_SESSION['pending_tenant_data'])) {
     header("Location: register_user.php");
     exit();
 }
 
-// ✅ Correctly get initial data from the session, not the database
 $tenant_initial_data = $_SESSION['pending_tenant_data'];
 $tenantName = $tenant_initial_data['fullName'];
 
@@ -28,7 +27,6 @@ $successMsg = "";
 $selectedLandlordId = "";
 $availableApartments = [];
 
-// Form field values to retain on POST back with errors
 $profession_val = '';
 $apartmentNo_val = '';
 $rentDate_val = '';
@@ -51,7 +49,7 @@ if ($landlordResult) {
     }
 }
 
-// If a landlord is selected (via GET request for AJAX-like refresh)
+
 if (isset($_GET['landlord_id']) && !empty($_GET['landlord_id'])) {
     $selectedLandlordId = (int)$_GET['landlord_id'];
     $apartmentQuery = "SELECT apartment_no FROM properties WHERE landlord_id = ? AND apartment_status = 'Vacant'";
@@ -76,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $emergencyContact = trim($_POST['emergencyContact']);
     $selectedLandlordId = (int)$_POST['landlordId'];
 
-    // Retain form values on error
+
     $profession_val = $profession;
     $apartmentNo_val = $apartmentNo;
     $rentDate_val = $rentDate;
@@ -87,10 +85,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (empty($profession) || empty($apartmentNo) || empty($rentDate) || empty($selectedLandlordId)) {
         $errorMsg = "Please fill in all required fields.";
     } else {
-        // Use a transaction to ensure all data is saved together, or none at all
         $conn->begin_transaction();
         try {
-            // 1. Insert the user data from the session into the `users` table
+          
             $stmtUser = $conn->prepare("INSERT INTO users (fullName, email, phoneNumber, password, profilePhoto, nationalId, userRole) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $stmtUser->bind_param("sssssss", 
                 $tenant_initial_data['fullName'], 
@@ -104,35 +101,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $stmtUser->execute();
             $new_tenant_id = $stmtUser->insert_id;
             $stmtUser->close();
-
-            // 2. Insert the extra info into the `tenants` table
             $stmtTenant = $conn->prepare("INSERT INTO tenants (tenant_id, name, profession, apartment_no, rent_date, family_members, emergency_contact) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $stmtTenant->bind_param("issssis", $new_tenant_id, $tenantName, $profession, $apartmentNo, $rentDate, $familyMembers, $emergencyContact);
             $stmtTenant->execute();
             $stmtTenant->close();
-
-            // 3. Update the property's status to 'Occupied'
             $updatePropStmt = $conn->prepare("UPDATE properties SET apartment_status = 'Occupied' WHERE apartment_no = ?");
             $updatePropStmt->bind_param("s", $apartmentNo);
             $updatePropStmt->execute();
             $updatePropStmt->close();
-
-            // If everything is successful, commit the changes
             $conn->commit();
-
-            // Clear the temporary session data and redirect to login
             unset($_SESSION['pending_tenant_data']);
             header("Location: login.php?registered=success");
             exit();
 
         } catch (mysqli_sql_exception $exception) {
-            // If any step fails, roll back all changes
             $conn->rollback();
             $errorMsg = "Registration failed due to a database error. Please try again.";
         }
     }
     
-    // Re-fetch apartments if there was an error to repopulate the dropdown
     if (!empty($errorMsg) && !empty($selectedLandlordId)) {
         $availableApartments = [];
         $apartmentQuery = "SELECT apartment_no FROM properties WHERE landlord_id = ? AND apartment_status = 'Vacant'";
@@ -241,7 +228,6 @@ $conn->close();
     <script>
         function getApartments() {
             const landlordId = document.getElementById('landlordId').value;
-            // This reloads the page with the selected landlord's ID to populate apartments
             window.location.href = `tenantExtra_info.php?landlord_id=${landlordId}`;
         }
     </script>

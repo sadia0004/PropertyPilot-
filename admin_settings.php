@@ -10,11 +10,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'admin') {
 }
 $admin_id = $_SESSION['user_id'];
 
-// Retrieve user data from session for the header
+
 $fullName = $_SESSION['fullName'] ?? 'Admin';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette ---
+
 $primaryDark = '#0A0908';
 $primaryAccent = '#491D8B';
 $textColor = '#F2F4F3';
@@ -28,17 +28,16 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// For simplicity, we'll store settings in a JSON file. 
-// In a larger application, a dedicated `settings` table in the DB is better.
+
 $settingsFile = 'settings.json';
 $settings = [];
 
-// Load existing settings
+
 if (file_exists($settingsFile)) {
     $settings = json_decode(file_get_contents($settingsFile), true);
 }
 
-// Set default values if not present
+
 $defaults = [
     'site_name' => 'PropertyPilot',
     'contact_email' => 'support@propertypilot.com',
@@ -59,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $settings['rent_due_day'] = intval($_POST['rent_due_day']);
     $settings['maintenance_mode'] = $_POST['maintenance_mode'] ?? 'off';
 
-    // Save settings to the JSON file
+   
     if (file_put_contents($settingsFile, json_encode($settings, JSON_PRETTY_PRINT))) {
         $message = "Settings updated successfully!";
         $message_type = 'success';

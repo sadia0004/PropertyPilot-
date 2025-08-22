@@ -3,18 +3,18 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Protect the page: allow only logged-in admins
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
 $admin_id = $_SESSION['user_id'];
 
-// Retrieve user data from session for the header
+
 $fullName = $_SESSION['fullName'] ?? 'Admin';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette ---
+
 $primaryDark = '#0A0908';
 $primaryAccent = '#491D8B';
 $textColor = '#F2F4F3';
@@ -22,7 +22,6 @@ $secondaryBackground = '#F0F2F5';
 $cardBackground = '#FFFFFF';
 $actionMaintenance = '#dc3545';
 
-// --- DB Connection ---
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -33,7 +32,7 @@ $message_type = '';
 $property = null;
 $property_id = $_GET['id'] ?? 0;
 
-// --- Handle Form Submission ---
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $property_id = $_POST['property_id'];
     $apartment_rent = $_POST['apartment_rent'];
@@ -55,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-// --- Fetch Property Details for Editing ---
+
 if ($property_id > 0) {
     $stmt = $conn->prepare("SELECT * FROM properties WHERE property_id = ?");
     $stmt->bind_param("i", $property_id);
@@ -73,7 +72,7 @@ if ($property_id > 0) {
     $message_type = 'error';
 }
 
-// Fetch all landlords for the dropdown
+
 $landlords = [];
 $result = $conn->query("SELECT id, fullName FROM users WHERE userRole = 'landlord'");
 while($row = $result->fetch_assoc()) {

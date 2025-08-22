@@ -14,7 +14,7 @@ $admin_id = $_SESSION['user_id'];
 $fullName = $_SESSION['fullName'] ?? 'Admin';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette ---
+
 $primaryDark = '#0A0908';
 $primaryAccent = '#491D8B';
 $textColor = '#F2F4F3';
@@ -47,7 +47,7 @@ if (isset($_GET['delete_id'])) {
     $stmt->close();
 }
 
-// Check for success message from edit page
+
 if (isset($_SESSION['message'])) {
     $message = $_SESSION['message'];
     $message_type = $_SESSION['message_type'];
@@ -56,7 +56,7 @@ if (isset($_SESSION['message'])) {
 }
 
 
-// --- Fetch All Properties and Group by Landlord with Search ---
+
 $landlordProperties = [];
 $search_term = $_GET['search'] ?? '';
 

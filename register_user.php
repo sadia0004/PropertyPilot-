@@ -3,7 +3,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Database Connection
+
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -17,7 +17,6 @@ if ($conn->connect_error) {
 $successMsg = "";
 $errorMsg = "";
 
-// Form Handling
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $fullName     = trim($_POST['fullName']);
     $email        = trim($_POST['email']);
@@ -27,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $rawPassword  = $_POST['password'];
     $profilePhotoPath = "";
 
-    // Check for duplicate email or NID
+
     $checkStmt = $conn->prepare("SELECT email, nationalId FROM users WHERE email = ? OR nationalId = ?");
     if ($checkStmt) {
         $checkStmt->bind_param("ss", $email, $nationalId);
@@ -52,11 +51,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $errorMsg = "Database error while checking existing user.";
     }
 
-    // If no error, proceed
+ 
     if (empty($errorMsg)) {
         $hashedPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
 
-        // Handle profile photo upload
+     
         if (isset($_FILES["profilePhoto"]) && $_FILES["profilePhoto"]["error"] === UPLOAD_ERR_OK) {
             $uploadDir = "uploads/";
             if (!is_dir($uploadDir)) {
@@ -70,9 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
 
-        // ✅ UPDATED LOGIC: Handle different roles
+     
         if ($userRole === 'tenant') {
-            // For tenants, store data in session and move to the next step
+          
             $_SESSION['pending_tenant_data'] = [
                 'fullName' => $fullName,
                 'email' => $email,
@@ -85,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             header("Location: tenantExtra_info.php");
             exit();
         } else {
-            // For landlords and admins, insert directly
+          
             $insertStmt = $conn->prepare("INSERT INTO users (fullName, email, phoneNumber, password, profilePhoto, nationalId, userRole) VALUES (?, ?, ?, ?, ?, ?, ?)");
             if ($insertStmt) {
                 $insertStmt->bind_param("sssssss", $fullName, $email, $phoneNumber, $hashedPassword, $profilePhotoPath, $nationalId, $userRole);

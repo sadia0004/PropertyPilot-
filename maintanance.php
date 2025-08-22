@@ -3,18 +3,18 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Standardized session check
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'landlord') {
     header("Location: login.php");
     exit();
 }
 $landlord_id = $_SESSION['user_id'];
 
-// Retrieve user data from session
+
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette ---
+
 $primaryDark = '#021934';
 $primaryAccent = '#2c5dbd';
 $textColor = '#f0f4ff';
@@ -30,7 +30,7 @@ $actionScheduleDetails = '#fd7e14';
 $actionMaintenance = '#dc3545';
 
 
-// ✅ DB connection
+// DB connection
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -42,7 +42,7 @@ if ($conn->connect_error) {
 
 $updateMessage = '';
 
-// ✅ Handle Status Update
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $request_id = $_POST['request_id'];
     $new_status = $_POST['status'];
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
 }
 
 
-// ✅ Fetch maintenance requests for the landlord
+//Fetch maintenance requests for the landlord
 $requests = [];
 $query = "
     SELECT 

@@ -3,18 +3,17 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Protect the page: allow only logged-in landlords
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'landlord') {
     header("Location: login.php");
     exit();
 }
 $landlord_id = $_SESSION['user_id'];
 
-// Retrieve user data from session
 $fullName = $_SESSION['fullName'] ?? 'Landlord';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette ---
+
 $primaryDark = '#021934';
 $primaryAccent = '#2c5dbd';
 $textColor = '#f0f4ff';
@@ -22,14 +21,13 @@ $secondaryBackground = '#f0f4ff';
 $cardBackground = '#ffffff';
 $actionMaintenance = '#dc3545';
 
-// --- DB Connection ---
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) { die("Connection failed: " . $conn->connect_error); }
 
 $message = '';
 $message_type = '';
 
-// --- Fetch Landlord's Vacant Properties that don't have a post yet ---
+
 $vacant_properties = [];
 $stmt = $conn->prepare("
     SELECT p.property_id, p.apartment_no 
@@ -45,7 +43,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// --- Handle Form Submission ---
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $property_id = $_POST['property_id'];
     $title = trim($_POST['title']);
@@ -58,14 +56,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         $conn->begin_transaction();
         try {
-            // Insert into vacancy_posts including location
+           
             $stmt = $conn->prepare("INSERT INTO vacancy_posts (landlord_id, property_id, title, description, location) VALUES (?, ?, ?, ?, ?)");
             $stmt->bind_param("iisss", $landlord_id, $property_id, $title, $description, $location);
             $stmt->execute();
             $post_id = $stmt->insert_id;
             $stmt->close();
 
-            // Handle Multiple Image Uploads
+          
             if (isset($_FILES['photos']) && !empty(array_filter($_FILES['photos']['name']))) {
                 $uploadDir = "uploads/properties/";
                 if (!is_dir($uploadDir)) { mkdir($uploadDir, 0777, true); }
@@ -146,7 +144,7 @@ $conn->close();
                 <a href="landlord_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                 <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
                 <a href="post_vacancy.php" class="active"><i class="fas fa-bullhorn"></i> Post Vacancy</a>
-                <!-- Add other landlord links here -->
+               
             </div>
         </nav>
         <main>

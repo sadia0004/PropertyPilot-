@@ -10,24 +10,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'tenant') {
 }
 $userId = $_SESSION['user_id'];
 
-// --- Define Color Palette for Tenant Dashboard ---
+
 $primaryDark = '#1B3C53';
 $primaryAccent = '#2CA58D';
 $textColor = '#E0E0E0';
 $secondaryBackground = '#F0F2F5';
 $cardBackground = '#FFFFFF';
 
-// --- DB Connection ---
+// DB Connection
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// =================================================================
-// ✅ FETCHING ALL DYNAMIC DATA FOR DASHBOARD
-// =================================================================
 
-// --- 1. Fetch Basic User Info ---
 $fullName = "Tenant";
 $profilePhoto = "default-avatar.png";
 $query = "SELECT fullName, profilePhoto FROM users WHERE id = ?";
@@ -41,13 +37,13 @@ if ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// --- 2. Fetch Card Data - Current Due (including previous dues) ---
+
 $rentDue = 0;
 $pendingBills = 0;
 $upcomingMeetings = 0;
 $pendingMaintenance = 0;
 
-// Get all unpaid/partially paid bills for this tenant (fixed calculation)
+
 $query = "
     SELECT 
         SUM(GREATEST(0, (rb.rent_amount + rb.water_bill + rb.utility_bill + rb.guard_bill + rb.previous_due - IFNULL(t.total_paid, 0)))) as total_due
@@ -69,7 +65,7 @@ if ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// ✅ FIXED QUERY: Get count of all bills with a remaining balance
+
 $stmt = $conn->prepare("
     SELECT COUNT(*) as count 
     FROM rentandbill rb
@@ -87,15 +83,15 @@ $result = $stmt->get_result();
 $pendingBills = $result->fetch_assoc()['count'];
 $stmt->close();
 
-// Get count of upcoming meetings
+
 $result = $conn->query("SELECT COUNT(*) as count FROM meeting_schedule WHERE tenant_id = $userId AND date >= CURDATE()");
 $upcomingMeetings = $result->fetch_assoc()['count'];
 
-// Get count of pending maintenance requests
+
 $result = $conn->query("SELECT COUNT(*) as count FROM maintenance_requests WHERE tenant_id = $userId AND status != 'Completed'");
 $pendingMaintenance = $result->fetch_assoc()['count'];
 
-// --- 3. Data for Payment History Chart (Last 6 Months) ---
+
 $paymentHistory = [];
 for ($i = 5; $i >= 0; $i--) {
     $month = date('Y-m', strtotime("-$i months"));
@@ -126,7 +122,7 @@ foreach ($paymentHistory as $data) {
 }
 $stmt->close();
 
-// --- 4. Data for Maintenance Request Status Chart ---
+
 $maintenanceStatusData = [];
 $query = "
     SELECT status, COUNT(*) as count 
@@ -142,19 +138,17 @@ while ($row = $result->fetch_assoc()) {
     $maintenanceStatusData[$row['status']] = $row['count'];
 }
 $stmt->close();
-
-// Ensure all statuses are represented
 $maintenanceStatuses = ['Pending', 'In Progress', 'Completed'];
 $maintenanceLabels = [];
 $maintenanceData = [];
-$maintenanceColors = ['#f39c12', '#3498db', '#27ae60']; // Orange, Blue, Green
+$maintenanceColors = ['#f39c12', '#3498db', '#27ae60'];
 
 foreach ($maintenanceStatuses as $status) {
     $maintenanceLabels[] = $status;
     $maintenanceData[] = $maintenanceStatusData[$status] ?? 0;
 }
 
-// --- 5. Recent Transactions Data ---
+
 $recentTransactions = [];
 $query = "
     SELECT t.*, rb.billing_date, DATE_FORMAT(rb.billing_date, '%M %Y') as billing_month
@@ -173,7 +167,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// --- 6. FIXED Data for Yearly Summary Table ---
+
 $filter_year = $_GET['year'] ?? date('Y');
 $filter_month = $_GET['month'] ?? '';
 
@@ -455,7 +449,7 @@ $conn->close();
                                 <tr><td colspan="5" style="text-align:center;">No records found for the selected period.</td></tr>
                             <?php else: ?>
                                 <?php foreach($yearly_summary as $summary): 
-                                    // Determine status based on payment
+                                   
                                     $status = 'Unpaid';
                                     if ($summary['due_amount'] == 0) {
                                         $status = 'Paid';
@@ -481,7 +475,7 @@ $conn->close();
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- Payment History Chart (Bar) ---
+            //Payment History Chart (Bar)
             const paymentHistoryCtx = document.getElementById('paymentHistoryChart').getContext('2d');
             new Chart(paymentHistoryCtx, {
                 type: 'bar',
@@ -503,7 +497,7 @@ $conn->close();
                 }
             });
 
-            // --- Maintenance Status Chart (Doughnut) ---
+            //Maintenance Status Chart (Doughnut)
             <?php if(array_sum($maintenanceData) > 0): ?>
             const maintenanceStatusCtx = document.getElementById('maintenanceStatusChart').getContext('2d');
             new Chart(maintenanceStatusCtx, {

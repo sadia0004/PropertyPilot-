@@ -3,18 +3,18 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Protect the page: allow only logged-in admins
+
 if (!isset($_SESSION['user_id']) || $_SESSION['userRole'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
 $admin_id = $_SESSION['user_id'];
 
-// Retrieve user data from session for the header
+
 $fullName = $_SESSION['fullName'] ?? 'Admin';
 $profilePhoto = $_SESSION['profilePhoto'] ?? "default-avatar.png";
 
-// --- Define Color Palette ---
+
 $primaryDark = '#0A0908';
 $primaryAccent = '#491D8B';
 $textColor = '#F2F4F3';
@@ -22,7 +22,7 @@ $secondaryBackground = '#F0F2F5';
 $cardBackground = '#FFFFFF';
 $actionMaintenance = '#dc3545';
 
-// --- DB Connection ---
+
 $conn = new mysqli("localhost", "root", "", "property");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -31,7 +31,7 @@ if ($conn->connect_error) {
 $message = '';
 $message_type = '';
 
-// --- Handle User Deletion ---
+
 if (isset($_GET['delete_id'])) {
     $user_to_delete = intval($_GET['delete_id']);
     
@@ -53,7 +53,7 @@ if (isset($_GET['delete_id'])) {
 }
 
 
-// --- Fetch Landlords and Tenants, excluding Admins ---
+
 $users = [];
 $query = "
     SELECT
